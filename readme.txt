@@ -15,14 +15,14 @@ var x, iが定義されていたら文を評価するときにはスタックの
 0じゃないとき実行するif文は0のときにif文のjump先をif文内部の最後にする
 サブルーチン内で積んだスタックはすべて元に戻さないといけない
 
-Program: List[Statement]
-Statement: DEF | WHILE | IF | PRINT
+Program::= List[Statement]
+Statement::= DEF | WHILE | IF | PRINT | FUNC | CALL
 DEF: var ID = NUM
 WHILE: while (EXP) { Statement* }
 IF: if (EXP) { Statement* }
 PRINT: print NUM | STRING
 
-EXP = VAR | EXP + EXP | EXP - EXP | EXP * EXP | EXP / EXP | EXP % EXP
+EXP = VAR | NUM | ( EXP ) | EXP + EXP | EXP - EXP | EXP * EXP | EXP / EXP | EXP % EXP
 
 mod
 jmpifzero fizz
