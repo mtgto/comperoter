@@ -15,12 +15,17 @@ var x, iが定義されていたら文を評価するときにはスタックの
 0じゃないとき実行するif文は0のときにif文のjump先をif文内部の最後にする
 サブルーチン内で積んだスタックはすべて元に戻さないといけない
 
-Program::= List[Statement]
-Statement::= DEF | WHILE | IF | PRINT | FUNC | CALL
-DEF: var ID = NUM
-WHILE: while (EXP) { Statement* }
-IF: if (EXP) { Statement* }
-PRINT: print NUM | STRING
+関数を導入
+
+Program::= List[FUNC]
+FUNC::= (List[String], List[Statement]) // 引数 + 実装
+Statement::= DEF | SUBSTITUTE | WHILE | IF | PRINT | CALL
+DEF: var ID = NUM;
+SUBSTITUTDE: ID = EXP; // 代入
+WHILE: while (EXP) { Statement* } // whileループ
+IF: if (EXP) { Statement* } // if文(式にするべき？)
+PRINT_INT: print_int NUM;
+PRINT_CHAR: print_char NUM;
 
 EXP = VAR | NUM | ( EXP ) | EXP + EXP | EXP - EXP | EXP * EXP | EXP / EXP | EXP % EXP
 
