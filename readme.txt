@@ -27,7 +27,7 @@ IF: if (EXP) { Statement* } // if文(式にするべき？)
 PRINT_INT: print_int NUM;
 PRINT_CHAR: print_char NUM;
 
-EXP = VAR | NUM | ( EXP ) | EXP + EXP | EXP - EXP | EXP * EXP | EXP / EXP | EXP % EXP
+EXP::= VAR | NUM | ( EXP ) | EXP + EXP | EXP - EXP | EXP * EXP | EXP / EXP | EXP % EXP | VAR(EXP*)
 
 mod
 jmpifzero fizz
