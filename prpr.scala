@@ -70,7 +70,7 @@ class MyParser extends JavaTokenParsers {
 
   def factor: Parser[Exp] =
     "("~>expr<~")" |
-  floatingPointNumber ^^ {case a => Num(a.toFloat)} |
+  """[1-9][0-9]*|0""".r ^^ {case a => Num(a.toFloat)} |
   """[a-zA-Z]+""".r~"("~expr~rep("," ~> expr)~")"^^ {
     case funcName ~ "(" ~ a ~ rest ~ ")" => Call(funcName, a::rest)
   }
@@ -95,5 +95,7 @@ parser.parse("1+2")
 parser.parse("1+2-3")
 parser.parse("1*2*3*4")
 parser.parse("((((1))))")
+parser.parse("12.3")
 parser.parse("func(1,2,3)")
 parser.parse("1+func(1+2*3)")
+
