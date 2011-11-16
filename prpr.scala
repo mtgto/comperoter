@@ -130,8 +130,8 @@ class MyPrprCompiler {
   def convertExpr(expr: Exp, env: List[(String, Float)]): String = {
     expr match {
       case Var(name) =>
-	env.find(_==name) match {
-	  case Some(value) => value.toString
+	env.find(_._1==name) match {
+	  case Some(value) => prpr + one + floatToPrprString(value._2)
 	  case _ => throw new RuntimeException(name+" is not defined")
 	}
       case Num(num) =>
@@ -172,11 +172,13 @@ object prpr {
   }
 }
 val compiler = new MyPrprCompiler
+/*
 compiler.compile("0")
 compiler.compile("1")
 compiler.compile("2")
 compiler.compile("3")
 compiler.compile("4")
+*/
 /*
 val parser = new MyParser
 parser.parse_expr("1+(2+3)*4+5+(6/7)")
