@@ -18,14 +18,14 @@ var x, iが定義されていたら文を評価するときにはスタックの
 関数を導入
 
 Program::= List[Statement]
-Statement::= FUNC | DEF | SUBSTITUTE | WHILE | IF | PRINT | RETURN
+Statement::= FUNC | DEF | SUBSTITUTE | WHILE | IF | PRINT | (RETURN)
 FUNC::= def FUNCNAME({VAR}) { Statement* } // 引数 + 実装
 DEF: var ID = EXP;
 SUBSTITUTDE: ID = EXP; // 代入
 WHILE: while (EXP) { Statement* } // whileループ
 IF: if (EXP) { Statement* } // if文(式にするべき？)
-PRINT_INT: print_int NUM;
-PRINT_CHAR: print_char NUM;
+PRINT_INT: printInt NUM;
+PRINT_CHAR: printChar NUM;
 RETURN: return EXP;
 
 EXP::= VAR | 

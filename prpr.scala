@@ -43,9 +43,22 @@ case class Modulo(exp1:Exp, exp2:Exp) extends Exp
 case class Call(name:String, args:List[Exp]) extends Exp // 関数呼び出し
 
 class MyParser extends JavaTokenParsers {
+  def program: Parser[List[Stt]] =
+    rep(stat)
+
   def stat: Parser[Stt] =
     "var" ~> """[a-zA-Z]+""".r ~ ("=" ~> expr <~ ";") ^^ {
       case name ~ expr => Define(name, expr)
+    } | """[a-zA-Z]+""".r ~ ("=" ~> expr <~ ";") ^^ {
+      case name ~ expr => Substitute(name, expr)
+    } | (("while" ~ "(") ~> expr <~ (")" ~ "{")) ~ rep(stat) <~ "}" ^^ {
+      case expr ~ stats => While(expr, stats)
+    } | (("if" ~ "(") ~> expr <~ (")" ~ "{")) ~ rep(stat) <~ "}" ^^ {
+      case expr ~ stats => If(expr, stats)
+    } | "printInt" ~> expr <~ ";" ^^ {
+      case expr => PrintNum(expr)
+    } | "printChar" ~> expr <~ ";" ^^ {
+      case expr => PrintChar(expr)
     }
   
   def expr: Parser[Exp] =
@@ -80,7 +93,7 @@ class MyParser extends JavaTokenParsers {
     case funcName ~ "(" ~ args ~ ")" => Call(funcName, args)
   } | """[a-zA-Z]+""".r ^^ { Var(_) }
 
-  def parse(data:String) {
+  def parse_expr(data:String) {
     println(data)
     println(parseAll(expr, data))
   }
@@ -89,9 +102,14 @@ class MyParser extends JavaTokenParsers {
     println(data)
     println(parseAll(stat, data))
   }
+
+  def parse_program(data:String) {
+    println(data)
+    println(parseAll(program, data))
+  }
 }
 
-class MyEvaluator {
+class MyPrprCompiler {
 
 }
 
@@ -101,15 +119,21 @@ object prpr {
   }
 }
 val parser = new MyParser
-parser.parse("1+(2+3)*4+5+(6/7)")
-parser.parse("1+2")
-parser.parse("1+2-3")
-parser.parse("1*2*3*4")
-parser.parse("((((1))))")
-parser.parse("12.3")
-parser.parse("func(1,2,3)")
-parser.parse("func()")
-parser.parse("1+func(1+2*3)")
-parser.parse("1+x")
-parser.parse("1+x*2")
+parser.parse_expr("1+(2+3)*4+5+(6/7)")
+parser.parse_expr("1+2")
+parser.parse_expr("1+2-3")
+parser.parse_expr("1*2*3*4")
+parser.parse_expr("((((1))))")
+parser.parse_expr("12.3")
+parser.parse_expr("func(1,2,3)")
+parser.parse_expr("func()")
+parser.parse_expr("1+func(1+2*3)")
+parser.parse_expr("1+x")
+parser.parse_expr("1+x*2")
 parser.parse_statement("var x = 1 + 3 * 4;")
+parser.parse_statement("x = y * 3;")
+parser.parse_statement("while (y % 10) { y = y + 9; x = x + 3;}")
+parser.parse_statement("if (10) { y = y + 9; x = x + 3;}")
+parser.parse_statement("printInt 10;")
+parser.parse_statement("printChar 48;")
+parser.parse_program("var x = 48; x = x + 1; printChar x;")
