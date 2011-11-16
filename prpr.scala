@@ -110,6 +110,11 @@ class MyParser extends JavaTokenParsers {
 }
 
 class MyPrprCompiler {
+  val prpr = "あずにゃん"
+  val one = "ペロ"
+  val zero = "ﾍﾟﾛ"
+  val parser = new MyParser
+
   def convert(program: Program) {
     /*
     program.stats.foreach(
@@ -129,8 +134,34 @@ class MyPrprCompiler {
 	  case Some(value) => value.toString
 	  case _ => throw new RuntimeException(name+" is not defined")
 	}
-      case Num(digit) =>
-	digit.toString
+      case Num(num) =>
+	prpr + one + floatToPrprString(num)
+    }
+  }
+
+  def floatToPrprString(num: Float) = {
+    val numInt = num.toInt
+    if (numInt == 0)
+      zero + prpr
+    else
+      intToBinList(numInt).reverse.map(a => if (a==0) zero else one).foldRight(prpr)(_+_)
+  }
+
+  def intToBinList(num: Int): List[Int] = {
+    if (num == 0)
+      List()
+    else
+      num%2 :: intToBinList(num/2)
+  }
+
+  def compile(data: String) = {
+    val parseResult = parser.parseAll(parser.expr, data)
+    val compiler = new MyPrprCompiler
+    parseResult match {
+      case parser.Success(exp,_) =>
+	println(compiler.convertExpr(exp, List()))
+      case _ =>
+	println("failed to parse")
     }
   }
 }
@@ -140,16 +171,14 @@ object prpr {
     println("hoge")
   }
 }
-val parser = new MyParser
-val parseResult = parser.parseAll(parser.expr, "1")
 val compiler = new MyPrprCompiler
-parseResult match {
-  case parser.Success(exp,_) =>
-    println(compiler.convertExpr(exp, List()))
-  case _ =>
-    println("failed to parse")
-}
+compiler.compile("0")
+compiler.compile("1")
+compiler.compile("2")
+compiler.compile("3")
+compiler.compile("4")
 /*
+val parser = new MyParser
 parser.parse_expr("1+(2+3)*4+5+(6/7)")
 parser.parse_expr("1+2")
 parser.parse_expr("1+2-3")
