@@ -76,13 +76,12 @@ class MyParser extends JavaTokenParsers {
   def factor: Parser[Exp] =
     "("~>expr<~")" |
   """[1-9][0-9]*|0""".r ^^ {case a => Num(a.toFloat)} |
-  """[a-zA-Z]+""".r~"("~expr~rep("," ~> expr)~")"^^ {
-    case funcName ~ "(" ~ a ~ rest ~ ")" => Call(funcName, a::rest)
-  } | """[a-zA-Z]+""".r~"("~")"^^ {
-    case funcName ~ "(" ~ ")" => Call(funcName, List())
+  """[a-zA-Z]+""".r~"("~repsep(expr, ",")~")"^^ {
+    case funcName ~ "(" ~ args ~ ")" => Call(funcName, args)
   } | """[a-zA-Z]+""".r ^^ { Var(_) }
 
   def parse(data:String) {
+    println(data)
     println(parseAll(expr, data))
   }
 
