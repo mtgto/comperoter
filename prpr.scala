@@ -21,7 +21,7 @@ trait Stt {
   
 }
 
-case class Define(name:String, value:Num) extends Stt // 変数宣言
+case class Define(name:String, value:Exp) extends Stt // 変数宣言
 case class Substitute(name:String, value:Exp) extends Stt // 代入
 case class While(exp:Exp, stts:List[Stt]) extends Stt // whileループ
 case class If(exp:Exp, stts:List[Stt]) extends Stt // if
@@ -43,6 +43,11 @@ case class Modulo(exp1:Exp, exp2:Exp) extends Exp
 case class Call(name:String, args:List[Exp]) extends Exp // 関数呼び出し
 
 class MyParser extends JavaTokenParsers {
+  def stat: Parser[Stt] =
+    "var" ~> """[a-zA-Z]+""".r ~ ("=" ~> expr <~ ";") ^^ {
+      case name ~ expr => Define(name, expr)
+    }
+  
   def expr: Parser[Exp] =
     term ~ rep(("+" | "-") ~ term) ^^ {
       case a ~ rest => {
@@ -80,6 +85,11 @@ class MyParser extends JavaTokenParsers {
   def parse(data:String) {
     println(parseAll(expr, data))
   }
+
+  def parse_statement(data:String) {
+    println(data)
+    println(parseAll(stat, data))
+  }
 }
 
 class MyEvaluator {
@@ -103,4 +113,4 @@ parser.parse("func()")
 parser.parse("1+func(1+2*3)")
 parser.parse("1+x")
 parser.parse("1+x*2")
-
+parser.parse_statement("var x = 1 + 3 * 4;")

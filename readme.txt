@@ -17,17 +17,22 @@ var x, iが定義されていたら文を評価するときにはスタックの
 
 関数を導入
 
-Program::= List[FUNC]
-FUNC::= (List[String], List[Statement]) // 引数 + 実装
-Statement::= DEF | SUBSTITUTE | WHILE | IF | PRINT | CALL
-DEF: var ID = NUM;
+Program::= List[Statement]
+Statement::= FUNC | DEF | SUBSTITUTE | WHILE | IF | PRINT | RETURN
+FUNC::= def FUNCNAME({VAR}) { Statement* } // 引数 + 実装
+DEF: var ID = EXP;
 SUBSTITUTDE: ID = EXP; // 代入
 WHILE: while (EXP) { Statement* } // whileループ
 IF: if (EXP) { Statement* } // if文(式にするべき？)
 PRINT_INT: print_int NUM;
 PRINT_CHAR: print_char NUM;
+RETURN: return EXP;
 
-EXP::= VAR | NUM | ( EXP ) | EXP + EXP | EXP - EXP | EXP * EXP | EXP / EXP | EXP % EXP | VAR(EXP*)
+EXP::= VAR | 
+       NUM |
+       ( EXP ) |
+        EXP + EXP | EXP - EXP | EXP * EXP | EXP / EXP | EXP % EXP |
+	VAR(EXP*)
 
 mod
 jmpifzero fizz
