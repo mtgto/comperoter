@@ -8,11 +8,9 @@ object Main {
 */
 
 /**
- * 関数
+ * プログラム
  */
-trait Func {
-
-}
+case class Program(stts:List[Stt])
 
 /**
  * 文
@@ -43,8 +41,10 @@ case class Modulo(exp1:Exp, exp2:Exp) extends Exp
 case class Call(name:String, args:List[Exp]) extends Exp // 関数呼び出し
 
 class MyParser extends JavaTokenParsers {
-  def program: Parser[List[Stt]] =
-    rep(stat)
+  def program: Parser[Program] =
+    rep(stat) ^^ {
+      case stats => Program(stats)
+    }
 
   def stat: Parser[Stt] =
     "var" ~> """[a-zA-Z]+""".r ~ ("=" ~> expr <~ ";") ^^ {
@@ -110,7 +110,29 @@ class MyParser extends JavaTokenParsers {
 }
 
 class MyPrprCompiler {
+  def convert(program: Program) {
+    /*
+    program.stats.foreach(
+      stt => stt match {
+	case Define(name, value) =>
+	  // スタックにvalueを評価した結果をpushする
+      }
+    )
+    */
+  }
 
+  // 評価結果をスタックトップにpushする表現を返す
+  def convertExpr(expr: Exp, env: List[(String, Float)]): String = {
+    expr match {
+      case Var(name) =>
+	env.find(_==name) match {
+	  case Some(value) => value.toString
+	  case _ => throw new RuntimeException(name+" is not defined")
+	}
+      case Num(digit) =>
+	digit.toString
+    }
+  }
 }
 
 object prpr {
@@ -119,6 +141,15 @@ object prpr {
   }
 }
 val parser = new MyParser
+val parseResult = parser.parseAll(parser.expr, "1")
+val compiler = new MyPrprCompiler
+parseResult match {
+  case parser.Success(exp,_) =>
+    println(compiler.convertExpr(exp, List()))
+  case _ =>
+    println("failed to parse")
+}
+/*
 parser.parse_expr("1+(2+3)*4+5+(6/7)")
 parser.parse_expr("1+2")
 parser.parse_expr("1+2-3")
@@ -137,3 +168,4 @@ parser.parse_statement("if (10) { y = y + 9; x = x + 3;}")
 parser.parse_statement("printInt 10;")
 parser.parse_statement("printChar 48;")
 parser.parse_program("var x = 48; x = x + 1; printChar x;")
+*/
