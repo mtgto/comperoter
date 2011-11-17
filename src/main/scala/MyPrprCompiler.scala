@@ -30,11 +30,13 @@ class MyPrprCompiler {
 	      }
 	  }
 	}
-      val idx = find(List(), env, 0)
-      // 1. 変数のアドレスをスタックに積む 2. スタックトップのアドレスから値を取得する
-      (prpr + one + floatToPrprString(idx)) + (one + one + one)
+	val idx = find(List(), env, 0)
+	// 1. 変数のアドレスをスタックに積む 2. スタックトップのアドレスから値を取得する
+	(prpr + one + floatToPrprString(idx)) + (one + one + one)
       case Num(num) =>
 	prpr + one + floatToPrprString(num)
+      case Add(a, b) =>
+	convertExpr(a, env) + convertExpr(b, env) + one + zero + prpr + prpr
     }
   }
 
