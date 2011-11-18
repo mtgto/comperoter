@@ -29,8 +29,8 @@ class PrprParserSuite extends FunSuite {
     val one = compiler.one
 
     // 変数
-    assert(prpr + one + zero + prpr + one + one + one == compiler.convertExpr(parsedExpr("a"), List(List("a", "b", "c"))))
-    assert(prpr + one + one + prpr + one + one + one == compiler.convertExpr(parsedExpr("b"), List(List("a", "b", "c"))))
+    assert(prpr + one + zero + prpr + one + one + one == compiler.convertExpr(parsedExpr("a"), List("a", "b", "c")))
+    assert(prpr + one + one + prpr + one + one + one == compiler.convertExpr(parsedExpr("b"), List("a", "b", "c")))
 
     // 整数
     assert(prpr + one + zero + prpr == compiler.convertExpr(parsedExpr("0"), List()))

@@ -15,22 +15,31 @@ class MyPrprCompiler {
     */
   }
 
+  def convertStatements(stts: List[Stt], env: List[String]): String = {
+    stts match {
+      case hd::tl => {
+	hd match {
+	  case Define(name, expr) =>
+	    convertExpr(expr, env) + convertStatements(tl, name::env)
+	}
+      }
+      case _ => ""
+    }
+  }
+
   // 評価結果をスタックトップにpushする表現を返す
-  def convertExpr(expr: Exp, env: List[List[String]]): String = {
+  def convertExpr(expr: Exp, env: List[String]): String = {
     expr match {
       case Var(name) =>
-	def find(list:List[String], remain:List[List[String]], idx:Int):Int = {
+	def find(list:List[String], idx:Int):Int = {
 	  list match {
 	    case hd::tl =>
-	      if (name == hd) idx else find(tl, remain, idx+1)
+	      if (name == hd) idx else find(tl, idx+1)
 	    case _ =>
-	      remain match {
-		case hd::tl => find(hd, tl, idx)
-		case _ => throw new RuntimeException("variable " + name + "is not defined.")
-	      }
+	      throw new RuntimeException("variable " + name + "is not defined.")
 	  }
 	}
-	val idx = find(List(), env, 0)
+	val idx = find(env, 0)
 	// 1. 変数のアドレスをスタックに積む 2. スタックトップのアドレスから値を取得する
 	(prpr + one + floatToPrprString(idx)) + (one + one + one)
       case Num(num) =>
