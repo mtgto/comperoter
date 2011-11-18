@@ -37,6 +37,14 @@ class MyPrprCompiler {
 	prpr + one + floatToPrprString(num)
       case Add(a, b) =>
 	convertExpr(a, env) + convertExpr(b, env) + one + zero + prpr + prpr
+      case Sub(a, b) =>
+	convertExpr(a, env) + convertExpr(b, env) + one + zero + prpr + one
+      case Multiply(a, b) =>
+	convertExpr(a, env) + convertExpr(b, env) + one + zero + prpr + zero
+      case Divide(a, b) =>
+	convertExpr(a, env) + convertExpr(b, env) + one + zero + one + prpr
+      case Modulo(a, b) =>
+	convertExpr(a, env) + convertExpr(b, env) + one + zero + one + one
     }
   }
 

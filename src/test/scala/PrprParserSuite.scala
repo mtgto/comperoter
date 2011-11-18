@@ -43,7 +43,29 @@ class PrprParserSuite extends FunSuite {
 	   (prpr + one + one + zero + prpr) + // push 2
 	   (one + zero + prpr + prpr) == // add
 	     compiler.convertExpr(parsedExpr("1+2"), List()))
-    
-    println(prpr)
+
+    // 減算
+    assert((prpr + one + one + one + one + prpr) + // push 7
+	   (prpr + one + one + zero + zero + prpr) + // push 4
+	   (one + zero + prpr + one) == // sub
+	     compiler.convertExpr(parsedExpr("7-4"), List()))
+
+    // 乗算
+    assert((prpr + one + one + one + prpr) + // push 3
+	   (prpr + one + one + one + zero + prpr) + // push 6
+	   (one + zero + prpr + zero) == // mul
+	     compiler.convertExpr(parsedExpr("3*6"), List()))
+
+    // 除算
+    assert((prpr + one + one + zero + zero + one + prpr) + // push 9
+	   (prpr + one + one + one + prpr) + // push 3
+	   (one + zero + one + prpr) == // div
+	     compiler.convertExpr(parsedExpr("9/3"), List()))
+
+    // 剰余
+    assert((prpr + one + one + zero + one + zero + prpr) + // push 10
+	   (prpr + one + one + zero + zero + prpr) + // push 4
+	   (one + zero + one + one) == // mod
+	     compiler.convertExpr(parsedExpr("10%4"), List()))
   }
 }
