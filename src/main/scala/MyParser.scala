@@ -18,6 +18,8 @@ case class While(exp:Exp, stts:List[Stt]) extends Stt // whileループ
 case class If(exp:Exp, stts:List[Stt]) extends Stt // if
 case class PrintNum(exp:Exp) extends Stt // printNum
 case class PrintChar(exp:Exp) extends Stt // printChar
+case class Function(name:String, args:List[String], stts:List[Stt]) extends Stt // 関数
+case class Return(exp:Exp) extends Stt
 /**
  * 式
  */
@@ -52,6 +54,10 @@ class MyParser extends JavaTokenParsers {
       case expr => PrintNum(expr)
     } | "printChar" ~> expr <~ ";" ^^ {
       case expr => PrintChar(expr)
+    } | "return" ~> expr <~ ";" ^^ {
+      case expr => Return(expr)
+    } | "def" ~> """[a-zA-Z]+""".r ~ ("(" ~> repsep("""[a-zA-Z]+""".r, ",") <~ ")") ~ ("{" ~> rep(stat) <~ "}") ^^ {
+      case name ~ args ~ stts => Function(name, args, stts)
     }
   
   def expr: Parser[Exp] =

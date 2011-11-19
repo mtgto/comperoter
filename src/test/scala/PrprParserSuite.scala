@@ -9,10 +9,17 @@ class PrprParserSuite extends FunSuite {
 	case parser.Success(_, _) => true
 	case _ => false
       }
+    val parsedStatement = (in:String) =>
+      parser.parseAll(parser.stat, in) match {
+	case parser.Success(_, _) => true
+	case _ => false
+      }
 
     assert(parsedExpr("1"))
     assert(!parsedExpr("1.0"))
     assert(!parsedExpr("-1"))
+    assert(parsedStatement("return x;"))
+    assert(parsedStatement("def f(a, b, c) { printInt a+b-c; return c; }"))
   }
   
   test("compile") {
