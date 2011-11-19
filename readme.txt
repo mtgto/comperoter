@@ -131,12 +131,6 @@ func:
 ...
 func_return:
 // ヒープの後片付け
-push args.length
-push 0
-load
-sub
-push 0
-store
 dup
 jz (call1 - stack[0]) call1
 dup
@@ -152,6 +146,7 @@ if (args.length > 0) {
        push 1
        add
        push arg
+       swap
        store
    }
 }

@@ -18,6 +18,7 @@ class MyPrprCompiler {
 
   val push = (num: Int) => prpr + one + floatToPrprString(num)
   val dup = prpr + zero + prpr
+  val swap = prpr + zero + one
   val pop = prpr + zero + zero
   val storebase = one + one + prpr
   val store = (index: Int) => push(0) + loadbase + push(index) + add + storebase
@@ -31,8 +32,13 @@ class MyPrprCompiler {
   val printInt = one + prpr + prpr + one + pop
   val printChar = one + prpr + prpr + zero + pop
   val label = (num: Int) => zero + prpr + prpr + floatToPrprString(num)
+  val jmp = (label: Int) => zero + prpr + zero + floatToPrprString(label)
+  val jz = (label: Int) => zero + one + prpr + floatToPrprString(label)
 
   def convert(program: Program) = {
+    labelIndex = 0
+    functions = collection.mutable.Map[String, (Int, Int)]()
+    backLabels = collection.mutable.Map[String, collection.mutable.Set[(Int)]]()
     push(1) + push(0) + storebase + convertStatements(program.stts, List())
   }
 
@@ -49,6 +55,7 @@ class MyPrprCompiler {
     functions.getOrElseUpdate(name, {
       val startLabel = generateLabel()
       val goalLabel = generateLabel()
+      println("startLabel="+startLabel)
       (startLabel, goalLabel)
     })
   }
@@ -56,6 +63,9 @@ class MyPrprCompiler {
   var backLabels = collection.mutable.Map[String, collection.mutable.Set[(Int)]]()
   def addFuncBackLabel(funcName: String, label: Int) = {
     backLabels.getOrElseUpdate(funcName, collection.mutable.Set()) += label
+  }
+  def funcBackLabels(funcName: String) = {
+    backLabels.getOrElse(funcName, Set())
   }
 
   def convertStatements(stts: List[Stt], env: List[String]): String = {
@@ -106,7 +116,16 @@ class MyPrprCompiler {
 	  case Return(expr) =>
 	    "" // 親関数のゴール地点にジャンプする
 	  case Function(name, args, stts) =>
-	    convertStatements(tl, env)
+	    val converted = convertStatements(tl, env)
+	    val funcTuple = generateFuncLabelTuple(name)
+	    converted +
+	    label(funcTuple._1) +
+	    convertStatements(stts, args) +
+	    label(funcTuple._2) +
+	    (funcBackLabels(name).map(label => dup+push(label)+sub+jz(label)+pop).reduceLeftOption(_+_) match {
+	      case Some(a) => a
+	      case _ => ""
+	    })
 	  case _ =>
 	    throw new RuntimeException("not implemented.")
 	}
@@ -143,21 +162,19 @@ class MyPrprCompiler {
 	convertExpr(a, env) + convertExpr(b, env) + mod
       case Call(name, args) =>
 	val returnLabel = generateLabel() // 副作用で関数から帰ってくる場所の新しいラベルを生成
+	addFuncBackLabel(name, returnLabel)
 	val funcTuple = generateFuncLabelTuple(name)
 	val converted = push(returnLabel) +
-	push(funcTuple._1) + // 関数ラベルへのジャンプ
+	jmp(funcTuple._1) + // 関数ラベルへのジャンプ
 	label(returnLabel)
 	if (args.length > 0) {
-	  push(0) +
-	  load +
-	  args.map(dup+push(1)+add+convertExpr(_, env)+store).reduceLeft(_+_) +
+	  load(0) +
+	  args.map(dup+push(1)+add+convertExpr(_, env)+swap+storebase).reduceLeft(_+_) +
 	  converted +
-	  push(0) +
-	  load +
+	  load(0) +
 	  push(args.length) +
 	  sub +
-	  push(0) +
-	  store
+	  store(0)
 	} else {
 	  converted
 	}
