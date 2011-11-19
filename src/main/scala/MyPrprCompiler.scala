@@ -16,8 +16,20 @@ class MyPrprCompiler {
   // 上記以外
   case class Code(code: String) extends Converted
 
+  val push = (num: Int) => prpr + one + floatToPrprString(num)
+  val pop = prpr + zero + zero
+  val store = one + one + prpr
+  val load = one + one + one
+  val add = one + zero + prpr + prpr
+  val sub = one + zero + prpr + one
+  val mul = one + zero + prpr + zero
+  val div = one + zero + one + prpr
+  val mod = one + zero + one + one
+  val printInt = one + prpr + prpr + one
+  val printChar = one + prpr + prpr + zero
+
   def convert(program: Program) = {
-    convertStatements(program.stts, List())
+    push(1) + push(0) + store + convertStatements(program.stts, List())
   }
 
   var label = 0
@@ -64,15 +76,12 @@ class MyPrprCompiler {
 	    (zero + prpr + prpr + floatToPrprString(goal)) + // goal:
 	    convertStatements(tl, env)
 	  case PrintNum(expr) =>
-	    println("PrintNum");
-	    println(expr);
-	    println(env);
 	    convertExpr(expr, env) + // push expr
-	    (one + prpr + prpr + one) + // print_num
+	    printInt + // print_num
 	    convertStatements(tl, env)
 	  case PrintChar(expr) =>
 	    convertExpr(expr, env) + // push expr
-	    (one + prpr + prpr + zero) + // print_char
+	    printChar + // print_char
 	    convertStatements(tl, env)
 	  case _ =>
 	    throw new RuntimeException("not implemented.")
@@ -100,22 +109,21 @@ class MyPrprCompiler {
       case Num(num) =>
 	prpr + one + floatToPrprString(num)
       case Add(a, b) =>
-	convertExpr(a, env) + convertExpr(b, env) + one + zero + prpr + prpr
+	convertExpr(a, env) + convertExpr(b, env) + add
       case Sub(a, b) =>
-	convertExpr(a, env) + convertExpr(b, env) + one + zero + prpr + one
+	convertExpr(a, env) + convertExpr(b, env) + sub
       case Multiply(a, b) =>
-	convertExpr(a, env) + convertExpr(b, env) + one + zero + prpr + zero
+	convertExpr(a, env) + convertExpr(b, env) + mul
       case Divide(a, b) =>
-	convertExpr(a, env) + convertExpr(b, env) + one + zero + one + prpr
+	convertExpr(a, env) + convertExpr(b, env) + div
       case Modulo(a, b) =>
-	convertExpr(a, env) + convertExpr(b, env) + one + zero + one + one
+	convertExpr(a, env) + convertExpr(b, env) + mod
       case Call(name, args) =>
 	val label = generateLabel() // 副作用で関数から帰ってくる場所の新しいラベルを生成
-	args.map(exp => convertExpr(exp, env)).reduceLeft(_+_) +
-	prpr + one + floatToPrprString(label) + // 戻り先をプッシュ
+	args.map(exp => convertExpr(exp, env)).reduceLeft(_+_) + // 変数のpush
 	// Call(name) + // 関数ラベルへのジャンプ
 	zero + prpr + prpr + floatToPrprString(label) + // ラベル
-	(prpr + zero + zero) * args.length // 引数をpop
+	(pop * args.length) // 引数をpop
     }
   }
 
