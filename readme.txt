@@ -69,3 +69,35 @@ while (i < x) {
       print '\n'
       i++
 }
+
+if (exp) { … }
+
+push exp
+ifzero goto label1
+…
+label1:
+
+
+while (exp) { … }
+
+label1:
+push exp
+ifzero goto label2
+…
+goto label1
+label2:
+
+
+var a = f(x, y)
+
+push x
+push y
+push label1
+jump label2
+label1:
+pop // y
+pop // x
+......
+label2: // func f
+...
+ret

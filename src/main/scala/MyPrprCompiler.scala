@@ -3,6 +3,18 @@ class MyPrprCompiler {
   val one = "ペロ"
   val zero = "ﾍﾟﾛ"
   val parser = new MyParser
+  
+  // コンバートされた中間言語
+  trait Converted {
+    //def assemble():String
+  }
+
+  // コード後の位置に置かれるラベル
+  case class Label(code: String) extends Converted
+  // 関数へのジャンプ
+  case class Jump(name: String) extends Converted
+  // 上記以外
+  case class Code(code: String) extends Converted
 
   def convert(program: Program) {
     /*
@@ -54,6 +66,12 @@ class MyPrprCompiler {
 	convertExpr(a, env) + convertExpr(b, env) + one + zero + one + prpr
       case Modulo(a, b) =>
 	convertExpr(a, env) + convertExpr(b, env) + one + zero + one + one
+      case Call(name, args) =>
+	// val label = generateLabel() // 副作用で関数から帰ってくる場所の新しいラベルを生成
+	args.map(exp => convertExpr(exp, env)).reduceLeft(_+_) +
+	// Call(name) + // 関数ラベルへのジャンプ
+	// zero + prpr + prpr + floatToPrprString(label) + // ラベル
+	(prpr + zero + zero) * args.length // 引数をpop
     }
   }
 
