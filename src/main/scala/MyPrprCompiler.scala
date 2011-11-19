@@ -16,24 +16,51 @@ class MyPrprCompiler {
   // 上記以外
   case class Code(code: String) extends Converted
 
-  def convert(program: Program) {
-    /*
-    program.stats.foreach(
-      stt => stt match {
-	case Define(name, value) =>
-	  // スタックにvalueを評価した結果をpushする
-      }
-    )
-    */
+  def convert(program: Program) = {
+    convertStatements(program.stts, List())
+  }
+
+  var label = 0
+  def generateLabel() = {
+    val newLabel = label
+    label = label + 1
+    newLabel
   }
 
   def convertStatements(stts: List[Stt], env: List[String]): String = {
     stts match {
       case hd::tl => {
-	hd match {
-	  case Define(name, expr) =>
-	    convertExpr(expr, env) + convertStatements(tl, name::env)
-	}
+	val converted = 
+	  hd match {
+	    case Define(name, expr) =>
+	      convertExpr(expr, env) + convertStatements(tl, name::env)
+	    case Substitute(name, expr) =>
+	      val index = env.indexOf(name)
+	      if (index >= 0)
+		convertExpr(expr, env) + // push expr
+		floatToPrprString(index) + // push index
+		(one + one + prpr) // stack[index] = expr
+	      else
+		throw new RuntimeException("variable " + name + " is not defined.")
+	    case While(expr, whileStatements) =>
+	      val start = generateLabel() // ループ開始位置
+	      val goal = generateLabel() // ループ直後
+	      (zero + prpr + prpr + floatToPrprString(start)) + // start:
+	      convertExpr(expr, env) + // push expr
+	      (zero + one + prpr + floatToPrprString(goal)) + // ifzero goal
+	      convertStatements(whileStatements, env) +
+	      (zero + prpr + zero + floatToPrprString(start)) + // jmp start
+	      (zero + prpr + prpr + floatToPrprString(goal)) // goal:
+	    case PrintNum(expr) =>
+	      convertExpr(expr, env) + // push expr
+	      (one + prpr + prpr + one) // print_num
+	    case PrintChar(expr) =>
+	      convertExpr(expr, env) + // push expr
+	      (one + prpr + prpr + zero) // print_char
+	    case _ =>
+	      throw new RuntimeException("not implemented.")
+	  }
+	converted + convertStatements(tl, env)
       }
       case _ => ""
     }
@@ -48,7 +75,7 @@ class MyPrprCompiler {
 	    case hd::tl =>
 	      if (name == hd) idx else find(tl, idx+1)
 	    case _ =>
-	      throw new RuntimeException("variable " + name + "is not defined.")
+	      throw new RuntimeException("variable " + name + " is not defined.")
 	  }
 	}
 	val idx = find(env, 0)
@@ -67,10 +94,11 @@ class MyPrprCompiler {
       case Modulo(a, b) =>
 	convertExpr(a, env) + convertExpr(b, env) + one + zero + one + one
       case Call(name, args) =>
-	// val label = generateLabel() // 副作用で関数から帰ってくる場所の新しいラベルを生成
+	val label = generateLabel() // 副作用で関数から帰ってくる場所の新しいラベルを生成
 	args.map(exp => convertExpr(exp, env)).reduceLeft(_+_) +
+	prpr + one + floatToPrprString(label) + // 戻り先をプッシュ
 	// Call(name) + // 関数ラベルへのジャンプ
-	// zero + prpr + prpr + floatToPrprString(label) + // ラベル
+	zero + prpr + prpr + floatToPrprString(label) + // ラベル
 	(prpr + zero + zero) * args.length // 引数をpop
     }
   }

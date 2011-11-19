@@ -68,4 +68,22 @@ class PrprParserSuite extends FunSuite {
 	   (one + zero + one + one) == // mod
 	     compiler.convertExpr(parsedExpr("10%4"), List()))
   }
+
+  test("compile program") {
+    val parser = new MyParser
+    val parsedProgram = (in:String) =>
+      parser.parseAll(parser.program, in) match {
+	case parser.Success(program, _) => program
+	case _ => throw new RuntimeException("failed to parse a program: " + in)
+      }
+    
+    val compiler = new MyPrprCompiler
+    val prpr = compiler.prpr
+    val zero = compiler.zero
+    val one = compiler.one
+    
+    println("programs = " + compiler.convert(parsedProgram("printInt 10+20*30;")))
+    println("programs = " + compiler.convert(parsedProgram("while (1) { printInt 42; }")))
+    assert(false)
+  }
 }
