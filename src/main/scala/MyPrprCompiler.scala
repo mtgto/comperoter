@@ -17,6 +17,7 @@ class MyPrprCompiler {
   case class Code(code: String) extends Converted
 
   val push = (num: Int) => prpr + one + floatToPrprString(num)
+  val dup = prpr + zero + prpr
   val pop = prpr + zero + zero
   val storebase = one + one + prpr
   val store = (index: Int) => push(0) + loadbase + push(index) + add + storebase
@@ -42,8 +43,19 @@ class MyPrprCompiler {
     newLabel
   }
 
-  var functions = Array()
-  def generateFuncLabel(name: String) = {
+  // 関数名から始点ラベル、終点ラベルを保持するマップ
+  var functions = collection.mutable.Map[String, (Int, Int)]()
+  def generateFuncLabelTuple(name: String) = {
+    functions.getOrElseUpdate(name, {
+      val startLabel = generateLabel()
+      val goalLabel = generateLabel()
+      (startLabel, goalLabel)
+    })
+  }
+  // 関数名から戻りラベルの集合を保持するマップ
+  var backLabels = collection.mutable.Map[String, collection.mutable.Set[(Int)]]()
+  def addFuncBackLabel(funcName: String, label: Int) = {
+    backLabels.getOrElseUpdate(funcName, collection.mutable.Set()) += label
   }
 
   def convertStatements(stts: List[Stt], env: List[String]): String = {
@@ -91,6 +103,10 @@ class MyPrprCompiler {
 	    convertExpr(expr, env) + // push expr
 	    printChar + // print_char
 	    convertStatements(tl, env)
+	  case Return(expr) =>
+	    "" // 親関数のゴール地点にジャンプする
+	  case Function(name, args, stts) =>
+	    convertStatements(tl, env)
 	  case _ =>
 	    throw new RuntimeException("not implemented.")
 	}
@@ -126,11 +142,25 @@ class MyPrprCompiler {
       case Modulo(a, b) =>
 	convertExpr(a, env) + convertExpr(b, env) + mod
       case Call(name, args) =>
-	val label = generateLabel() // 副作用で関数から帰ってくる場所の新しいラベルを生成
-	args.map(exp => convertExpr(exp, env)).reduceLeft(_+_) + // 変数のpush
-	// Call(name) + // 関数ラベルへのジャンプ
-	zero + prpr + prpr + floatToPrprString(label) + // ラベル
-	(pop * args.length) // 引数をpop
+	val returnLabel = generateLabel() // 副作用で関数から帰ってくる場所の新しいラベルを生成
+	val funcTuple = generateFuncLabelTuple(name)
+	val converted = push(returnLabel) +
+	push(funcTuple._1) + // 関数ラベルへのジャンプ
+	label(returnLabel)
+	if (args.length > 0) {
+	  push(0) +
+	  load +
+	  args.map(dup+push(1)+add+convertExpr(_, env)+store).reduceLeft(_+_) +
+	  converted +
+	  push(0) +
+	  load +
+	  push(args.length) +
+	  sub +
+	  push(0) +
+	  store
+	} else {
+	  converted
+	}
     }
   }
 

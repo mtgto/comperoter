@@ -22,6 +22,7 @@ printInt, printCharはスタック操作をしない
 呼び出し先では引数の数だけheap[heap[0]++] = args[i]を行い、
 帰るときにheap[0]を引数の数だけ引く
 スタックのトップには関数の戻り値が乗っかる　return文が最後にないといけない(途中にあってもいい)
+コンパイル時に見つけられるといいなあ とりあえず最後にあるかチェックだけする?
 
 関数から帰るときは帰り先がわからないので、
 関数名ごとに呼び出し元リストを用意しておき、それを利用する
@@ -33,6 +34,12 @@ def f() {
     if (*stack - label2 == 0) goto label2
 }
 関数の変換はプログラムの最後で行うことにする
+
+比較
+if (a == b) => ifzero a - b
+if (a > b) => ifneg b - a
+if (a < b) => ifneg a - b
+小なりイコールとかあるので、if-elseにして入れ替えとか
 
 コンパイラの実装
 文の評価時にはvarの数だけスタックに積まれてるようにする
@@ -48,6 +55,8 @@ var x, iが定義されていたら文を評価するときにはスタックの
 関数を導入
 関数呼ぶ前に戻ってくる位置にラベルを設置、その値をスタックに積む
 関数は実装のあとに置かれるため、ジャンプする先のラベルの計算はコンパイル後に行う
+
+ラベル名は遅延評価で出したいなあ
 
 Program::= List[Statement]
 Statement::= FUNC | DEF | SUBSTITUTE | WHILE | IF | PRINT | (RETURN)
@@ -116,17 +125,47 @@ ifzero goto label2
 goto label1
 label2:
 
+def func(args) { ... }
+
+func:
+...
+func_return:
+// ヒープの後片付け
+push args.length
+push 0
+load
+sub
+push 0
+store
+dup
+jz (call1 - stack[0]) call1
+dup
+jz (call2 - stack[0]) call1
 
 var a = f(x, y)
 
-push x
-push y
+if (args.length > 0) {
+   push 0
+   load
+   foreach (arg in args) {
+       dup
+       push 1
+       add
+       push arg
+       store
+   }
+}
 push label1
 jump label2
 label1:
-pop // y
-pop // x
+if (args.length > 0) {
+   push 0
+   load
+   push args.length
+   sub
+   push 0
+   store
+}
 ......
 label2: // func f
-...
-ret
+func_return:

@@ -18,6 +18,9 @@ class PrprParserSuite extends FunSuite {
     assert(parsedExpr("1"))
     assert(!parsedExpr("1.0"))
     assert(!parsedExpr("-1"))
+    assert(parsedExpr("func(1, 2, 3)"));
+    assert(parsedExpr("func()"));
+    assert(parsedExpr("func(a)"));
     assert(parsedStatement("return x;"))
     assert(parsedStatement("def f(a, b, c) { printInt a+b-c; return c; }"))
   }
@@ -95,6 +98,7 @@ class PrprParserSuite extends FunSuite {
     println("programs[4] = " + compiler.convert(parsedProgram("var x = 10; printInt x;")))
     println("programs[5] = " + compiler.convert(parsedProgram("var x = 10; var y = 20; printInt y; printInt x;")))
     println("programs[6] = " + compiler.convert(parsedProgram("var x = 10; while (x) { printInt x; x = x - 1;}")))
+    println("programs[7] = " + compiler.convert(parsedProgram("var a = f(10, 20); def f(a, b) { return a + b; }")))
     assert(false)
   }
 }
