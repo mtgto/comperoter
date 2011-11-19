@@ -131,8 +131,10 @@ func:
 ...
 func_return:
 // ヒープの後片付け
+swap
 dup
 jz (call1 - stack[0]) call1
+pop
 dup
 jz (call2 - stack[0]) call1
 
@@ -143,12 +145,19 @@ if (args.length > 0) {
    load
    foreach (arg in args) {
        dup
-       push 1
-       add
        push arg
        swap
        store
+       push 1
+       add
    }
+   pop
+   push 0
+   loadbase
+   push env.length
+   add
+   push 0
+   storebase
 }
 push label1
 jump label2
@@ -156,7 +165,7 @@ label1:
 if (args.length > 0) {
    push 0
    load
-   push args.length
+   push env.length
    sub
    push 0
    store

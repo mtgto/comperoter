@@ -114,14 +114,15 @@ class MyPrprCompiler {
 	    printChar + // print_char
 	    convertStatements(tl, env)
 	  case Return(expr) =>
-	    "" // 親関数のゴール地点にジャンプする
+	    convertExpr(expr, env) // 親関数のゴール地点にジャンプする
 	  case Function(name, args, stts) =>
 	    val converted = convertStatements(tl, env)
 	    val funcTuple = generateFuncLabelTuple(name)
 	    converted +
 	    label(funcTuple._1) +
-	    convertStatements(stts, args) +
+	    convertStatements(stts, env:::args) +
 	    label(funcTuple._2) +
+	    swap + 
 	    (funcBackLabels(name).map(label => dup+push(label)+sub+jz(label)+pop).reduceLeftOption(_+_) match {
 	      case Some(a) => a
 	      case _ => ""
@@ -168,13 +169,11 @@ class MyPrprCompiler {
 	jmp(funcTuple._1) + // 関数ラベルへのジャンプ
 	label(returnLabel)
 	if (args.length > 0) {
-	  load(0) +
-	  args.map(dup+push(1)+add+convertExpr(_, env)+swap+storebase).reduceLeft(_+_) +
+	  push(0) + loadbase + push(env.length) + add + dup + push(0) + storebase +
+	  args.map(dup+convertExpr(_, env)+swap+storebase+push(1)+add).reduceLeft(_+_) +
 	  converted +
-	  load(0) +
-	  push(args.length) +
-	  sub +
-	  store(0)
+	  pop + push(0) + loadbase + push(env.length) + sub + push(0) + storebase
+
 	} else {
 	  converted
 	}

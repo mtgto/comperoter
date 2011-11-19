@@ -100,7 +100,7 @@ class PrprParserSuite extends FunSuite {
     println("programs[6] = " + compiler.convert(parsedProgram("var x = 10; while (x) { printInt x; x = x - 1;}")))
     println("programs[7] = " + compiler.convert(parsedProgram("var a = f(10);")))
     println("programs[8] = " + compiler.convert(parsedProgram("def f(a, b) { return a + b; }")))
-    println("programs[9] = " + compiler.convert(parsedProgram("var a = f(10, 20); printInt a; def f(a, b) { return a + b; }")))
+    println("programs[9] = " + compiler.convert(parsedProgram("printInt f(10, 20); def f(a, b) { return a + b; }")))
     assert(false)
   }
 }
