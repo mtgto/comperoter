@@ -82,8 +82,11 @@ class PrprParserSuite extends FunSuite {
     val zero = compiler.zero
     val one = compiler.one
     
-    println("programs = " + compiler.convert(parsedProgram("printInt 10+20*30;")))
-    println("programs = " + compiler.convert(parsedProgram("while (1) { printInt 42; }")))
+    println("programs[1] = " + compiler.convert(parsedProgram("printInt 10+20*30;")))
+    println("programs[2] = " + compiler.convert(parsedProgram("while (1) { printInt 42; }")))
+    println("programs[3] = " + compiler.convert(parsedProgram("var x = 10;")))
+    println("programs[4] = " + compiler.convert(parsedProgram("var x = 10; printInt x;")))
+    //println("programs[5] = " + compiler.convert(parsedProgram("var x = 10; var y = 20; printInt y; printInt x;")))
     assert(false)
   }
 }

@@ -27,40 +27,56 @@ class MyPrprCompiler {
     newLabel
   }
 
+  var functions = Array()
+  def generateFuncLabel(name: String) = {
+  }
+
   def convertStatements(stts: List[Stt], env: List[String]): String = {
     stts match {
       case hd::tl => {
-	val converted = 
-	  hd match {
-	    case Define(name, expr) =>
-	      convertExpr(expr, env) + convertStatements(tl, name::env)
-	    case Substitute(name, expr) =>
-	      val index = env.indexOf(name)
-	      if (index >= 0)
-		convertExpr(expr, env) + // push expr
-		floatToPrprString(index) + // push index
-		(one + one + prpr) // stack[index] = expr
-	      else
-		throw new RuntimeException("variable " + name + " is not defined.")
-	    case While(expr, whileStatements) =>
-	      val start = generateLabel() // ループ開始位置
-	      val goal = generateLabel() // ループ直後
-	      (zero + prpr + prpr + floatToPrprString(start)) + // start:
+	hd match {
+	  case Define(name, expr) =>
+	    convertExpr(expr, env) + convertStatements(tl, name::env)
+	  case Substitute(name, expr) =>
+	    val index = env.indexOf(name)
+	    if (index >= 0)
 	      convertExpr(expr, env) + // push expr
-	      (zero + one + prpr + floatToPrprString(goal)) + // ifzero goal
-	      convertStatements(whileStatements, env) +
-	      (zero + prpr + zero + floatToPrprString(start)) + // jmp start
-	      (zero + prpr + prpr + floatToPrprString(goal)) // goal:
-	    case PrintNum(expr) =>
-	      convertExpr(expr, env) + // push expr
-	      (one + prpr + prpr + one) // print_num
-	    case PrintChar(expr) =>
-	      convertExpr(expr, env) + // push expr
-	      (one + prpr + prpr + zero) // print_char
-	    case _ =>
-	      throw new RuntimeException("not implemented.")
-	  }
-	converted + convertStatements(tl, env)
+	      floatToPrprString(index) + // push index
+	      (one + one + prpr) + // stack[index] = expr
+	      convertStatements(tl, env)
+	    else
+	      throw new RuntimeException("variable " + name + " is not defined.")
+	  case While(expr, whileStatements) =>
+	    val start = generateLabel() // ループ開始位置
+	    val goal = generateLabel() // ループ直後
+	    (zero + prpr + prpr + floatToPrprString(start)) + // start:
+	    convertExpr(expr, env) + // push expr
+	    (zero + one + prpr + floatToPrprString(goal)) + // ifzero goal
+	    convertStatements(whileStatements, env) +
+	    (zero + prpr + zero + floatToPrprString(start)) + // jmp start
+	    (zero + prpr + prpr + floatToPrprString(goal)) + // goal:
+	    convertStatements(tl, env)
+	  case If(expr, ifStatements) =>
+	    val goal = generateLabel()
+	    convertExpr(expr, env) + // push expr
+	    (zero + one + prpr + floatToPrprString(goal)) + // ifzero goal
+	    convertStatements(ifStatements, env) +
+	    (zero + prpr + prpr + floatToPrprString(goal)) + // goal:
+	    convertStatements(tl, env)
+	  case PrintNum(expr) =>
+	    println("PrintNum");
+	    println(expr);
+	    println(env);
+	    convertExpr(expr, env) + // push expr
+	    (one + prpr + prpr + one) + // print_num
+	    convertStatements(tl, env)
+	  case PrintChar(expr) =>
+	    convertExpr(expr, env) + // push expr
+	    (one + prpr + prpr + zero) + // print_char
+	    convertStatements(tl, env)
+	  case _ =>
+	    throw new RuntimeException("not implemented.")
+	}
       }
       case _ => ""
     }
