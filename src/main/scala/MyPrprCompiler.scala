@@ -18,24 +18,27 @@ class MyPrprCompiler {
 
   val push = (num: Int) => prpr + one + floatToPrprString(num)
   val pop = prpr + zero + zero
-  val store = one + one + prpr
-  val load = one + one + one
+  val storebase = one + one + prpr
+  val store = (index: Int) => push(0) + loadbase + push(index) + add + storebase
+  val loadbase = one + one + one // load op
+  val load = (index: Int) => push(0) + loadbase + push(index) + add + loadbase // push heap[heap[0]+index]
   val add = one + zero + prpr + prpr
   val sub = one + zero + prpr + one
   val mul = one + zero + prpr + zero
   val div = one + zero + one + prpr
   val mod = one + zero + one + one
-  val printInt = one + prpr + prpr + one
-  val printChar = one + prpr + prpr + zero
+  val printInt = one + prpr + prpr + one + pop
+  val printChar = one + prpr + prpr + zero + pop
+  val label = (num: Int) => zero + prpr + prpr + floatToPrprString(num)
 
   def convert(program: Program) = {
-    push(1) + push(0) + store + convertStatements(program.stts, List())
+    push(1) + push(0) + storebase + convertStatements(program.stts, List())
   }
 
-  var label = 0
+  var labelIndex = 0
   def generateLabel() = {
-    val newLabel = label
-    label = label + 1
+    val newLabel = labelIndex
+    labelIndex = labelIndex + 1
     newLabel
   }
 
@@ -48,32 +51,37 @@ class MyPrprCompiler {
       case hd::tl => {
 	hd match {
 	  case Define(name, expr) =>
-	    convertExpr(expr, env) + convertStatements(tl, name::env)
+	    if (env.indexOf(name) >= 0)
+	      throw new RuntimeException("declared variable " + name + " is already defined.")
+	    else {
+	      val index = env.length
+	      val nextEnv = env ::: List(name)
+	      convertExpr(expr, env) + store(index) + convertStatements(tl, nextEnv)
+	    }
 	  case Substitute(name, expr) =>
 	    val index = env.indexOf(name)
 	    if (index >= 0)
 	      convertExpr(expr, env) + // push expr
-	      floatToPrprString(index) + // push index
-	      (one + one + prpr) + // stack[index] = expr
+	      store(index) + // heap[heap[0] + index] = stack[1]
 	      convertStatements(tl, env)
 	    else
 	      throw new RuntimeException("variable " + name + " is not defined.")
 	  case While(expr, whileStatements) =>
 	    val start = generateLabel() // ループ開始位置
 	    val goal = generateLabel() // ループ直後
-	    (zero + prpr + prpr + floatToPrprString(start)) + // start:
+	    label(start) + // start:
 	    convertExpr(expr, env) + // push expr
 	    (zero + one + prpr + floatToPrprString(goal)) + // ifzero goal
 	    convertStatements(whileStatements, env) +
 	    (zero + prpr + zero + floatToPrprString(start)) + // jmp start
-	    (zero + prpr + prpr + floatToPrprString(goal)) + // goal:
+	    label(goal) + // goal:
 	    convertStatements(tl, env)
 	  case If(expr, ifStatements) =>
 	    val goal = generateLabel()
 	    convertExpr(expr, env) + // push expr
 	    (zero + one + prpr + floatToPrprString(goal)) + // ifzero goal
 	    convertStatements(ifStatements, env) +
-	    (zero + prpr + prpr + floatToPrprString(goal)) + // goal:
+	    label(goal) + // goal:
 	    convertStatements(tl, env)
 	  case PrintNum(expr) =>
 	    convertExpr(expr, env) + // push expr
@@ -104,8 +112,7 @@ class MyPrprCompiler {
 	  }
 	}
 	val idx = find(env, 0)
-	// 1. 変数のアドレスをスタックに積む 2. スタックトップのアドレスから値を取得する
-	(prpr + one + floatToPrprString(idx)) + (one + one + one)
+	load(idx)
       case Num(num) =>
 	prpr + one + floatToPrprString(num)
       case Add(a, b) =>
