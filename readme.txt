@@ -145,6 +145,8 @@ if (args.length > 0) {
    load
    foreach (arg in args) {
        dup
+       push env.length-1
+       add
        push arg
        swap
        store

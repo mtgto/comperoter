@@ -34,7 +34,8 @@ class MyPrprCompiler {
   val label = (num: Int) => zero + prpr + prpr + floatToPrprString(num)
   val jmp = (label: Int) => zero + prpr + zero + floatToPrprString(label)
   val jz = (label: Int) => zero + one + prpr + floatToPrprString(label)
-
+  val end = zero + zero + zero
+  
   def convert(program: Program) = {
     labelIndex = 0
     functions = collection.mutable.Map[String, (Int, Int)]()
@@ -53,8 +54,8 @@ class MyPrprCompiler {
   var functions = collection.mutable.Map[String, (Int, Int)]()
   def generateFuncLabelTuple(name: String) = {
     functions.getOrElseUpdate(name, {
-      val startLabel = generateLabel()
-      val goalLabel = generateLabel()
+      val startLabel = generateLabel() + 100
+      val goalLabel = generateLabel() + 100
       println("startLabel="+startLabel)
       (startLabel, goalLabel)
     })
@@ -118,15 +119,15 @@ class MyPrprCompiler {
 	  case Function(name, args, stts) =>
 	    val converted = convertStatements(tl, env)
 	    val funcTuple = generateFuncLabelTuple(name)
-	    converted +
+	    println("backLabels="+funcBackLabels(name))
 	    label(funcTuple._1) +
-	    convertStatements(stts, env:::args) +
+	    convertStatements(stts, args) +
 	    label(funcTuple._2) +
 	    swap + 
 	    (funcBackLabels(name).map(label => dup+push(label)+sub+jz(label)+pop).reduceLeftOption(_+_) match {
 	      case Some(a) => a
 	      case _ => ""
-	    })
+	    }) + converted
 	  case _ =>
 	    throw new RuntimeException("not implemented.")
 	}
@@ -169,11 +170,18 @@ class MyPrprCompiler {
 	jmp(funcTuple._1) + // 関数ラベルへのジャンプ
 	label(returnLabel)
 	if (args.length > 0) {
+	  println("args="+args+",env="+env)
+	  /*
 	  push(0) + loadbase + push(env.length) + add + dup + push(0) + storebase +
-	  args.map(dup+convertExpr(_, env)+swap+storebase+push(1)+add).reduceLeft(_+_) +
+	  args.map(dup+push(env.length-1)+add+convertExpr(_, env)+swap+storebase+push(1)+add).reduceLeft(_+_) +
 	  converted +
 	  pop + push(0) + loadbase + push(env.length) + sub + push(0) + storebase
-
+	  */
+	  push(0) + loadbase +
+	  args.map(dup+push(env.length)+add+convertExpr(_, env)+swap+storebase+push(1)+add).reduceLeft(_+_) +
+	  pop + push(0) + loadbase + push(env.length) + add + push(0) + storebase +
+	  converted +
+	  pop + push(0) + loadbase + push(env.length) + sub + push(0) + storebase
 	} else {
 	  converted
 	}
