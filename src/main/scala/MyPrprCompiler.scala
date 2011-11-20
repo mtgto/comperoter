@@ -120,6 +120,7 @@ class MyPrprCompiler {
 	    val converted = convertStatements(tl, env)
 	    val funcTuple = generateFuncLabelTuple(name)
 	    println("backLabels="+funcBackLabels(name))
+	    converted +
 	    label(funcTuple._1) +
 	    convertStatements(stts, args) +
 	    label(funcTuple._2) +
@@ -127,12 +128,12 @@ class MyPrprCompiler {
 	    (funcBackLabels(name).map(label => dup+push(label)+sub+jz(label)+pop).reduceLeftOption(_+_) match {
 	      case Some(a) => a
 	      case _ => ""
-	    }) + converted
+	    })
 	  case _ =>
 	    throw new RuntimeException("not implemented.")
 	}
       }
-      case _ => ""
+      case _ => end
     }
   }
 
