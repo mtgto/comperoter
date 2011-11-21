@@ -14,8 +14,8 @@ trait Stt {
 
 case class Define(name:String, value:Exp) extends Stt // 変数宣言
 case class Substitute(name:String, value:Exp) extends Stt // 代入
-case class While(exp:Exp, stts:List[Stt]) extends Stt // whileループ
-case class If(exp:Exp, stts:List[Stt]) extends Stt // if
+case class While(exp:Cmp, stts:List[Stt]) extends Stt // whileループ
+case class If(exp:Cmp, stts:List[Stt]) extends Stt // if
 case class PrintNum(exp:Exp) extends Stt // printNum
 case class PrintChar(exp:Exp) extends Stt // printChar
 case class Function(name:String, args:List[String], stts:List[Stt]) extends Stt // 関数
@@ -35,6 +35,10 @@ case class Divide(exp1:Exp, exp2:Exp) extends Exp
 case class Modulo(exp1:Exp, exp2:Exp) extends Exp
 case class Call(name:String, args:List[Exp]) extends Exp // 関数呼び出し
 
+trait Cmp
+case class CmpEq(exp1:Exp, exp2:Exp) extends Cmp // exp1 == exp2
+case class CmpLT(exp1:Exp, exp2:Exp) extends Cmp // exp1 
+
 class MyParser extends JavaTokenParsers {
   def program: Parser[Program] =
     rep(stat) ^^ {
@@ -46,10 +50,10 @@ class MyParser extends JavaTokenParsers {
       case name ~ expr => Define(name, expr)
     } | """[a-zA-Z]+""".r ~ ("=" ~> expr <~ ";") ^^ {
       case name ~ expr => Substitute(name, expr)
-    } | (("while" ~ "(") ~> expr <~ (")" ~ "{")) ~ rep(stat) <~ "}" ^^ {
-      case expr ~ stats => While(expr, stats)
-    } | (("if" ~ "(") ~> expr <~ (")" ~ "{")) ~ rep(stat) <~ "}" ^^ {
-      case expr ~ stats => If(expr, stats)
+    } | (("while" ~ "(") ~> comparator <~ (")" ~ "{")) ~ rep(stat) <~ "}" ^^ {
+      case cmp ~ stats => While(cmp, stats)
+    } | (("if" ~ "(") ~> comparator <~ (")" ~ "{")) ~ rep(stat) <~ "}" ^^ {
+      case cmp ~ stats => If(cmp, stats)
     } | "printInt" ~> expr <~ ";" ^^ {
       case expr => PrintNum(expr)
     } | "printChar" ~> expr <~ ";" ^^ {
@@ -58,6 +62,13 @@ class MyParser extends JavaTokenParsers {
       case expr => Return(expr)
     } | "def" ~> """[a-zA-Z]+""".r ~ ("(" ~> repsep("""[a-zA-Z]+""".r, ",") <~ ")") ~ ("{" ~> rep(stat) <~ "}") ^^ {
       case name ~ args ~ stts => Function(name, args, stts)
+    }
+  
+  def comparator: Parser[Cmp] =
+    (expr <~ "==") ~ expr ^^ {
+      case exp1 ~ exp2 => CmpEq(exp1, exp2)
+    } | (expr <~ "<") ~ expr ^^ {
+      case exp1 ~ exp2 => CmpLT(exp1, exp2)
     }
   
   def expr: Parser[Exp] =

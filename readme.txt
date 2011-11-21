@@ -109,18 +109,23 @@ while (i < x) {
       i++
 }
 
-if (exp) { ... }
+if (exp) { ... } else { ... }
 
 push exp
 ifzero goto label1
 ...
+goto label2
 label1:
+...
+label2:
 
 while (exp) { ... }
 
 label1:
 push exp
-ifzero goto label2
+iftrue goto label3
+goto label2
+label3:
 ...
 goto label1
 label2:

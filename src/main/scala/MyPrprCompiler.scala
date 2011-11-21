@@ -34,6 +34,7 @@ class MyPrprCompiler {
   val label = (num: Int) => zero + prpr + prpr + floatToPrprString(num)
   val jmp = (label: Int) => zero + prpr + zero + floatToPrprString(label)
   val jz = (label: Int) => zero + one + prpr + floatToPrprString(label)
+  val jneg = (label: Int) => zero + one + one + floatToPrprString(label)
   val end = zero + zero + zero
   
   def convert(program: Program) = {
@@ -89,20 +90,18 @@ class MyPrprCompiler {
 	      convertStatements(tl, env)
 	    else
 	      throw new RuntimeException("variable " + name + " is not defined.")
-	  case While(expr, whileStatements) =>
+	  case While(cmp, whileStatements) =>
 	    val start = generateLabel() // ループ開始位置
 	    val goal = generateLabel() // ループ直後
 	    label(start) + // start:
-	    convertExpr(expr, env) + // push expr
-	    (zero + one + prpr + floatToPrprString(goal)) + // ifzero goal
+	    convertCmp(cmp, env, goal) +
 	    convertStatements(whileStatements, env) +
-	    (zero + prpr + zero + floatToPrprString(start)) + // jmp start
+	    jmp(start) + // jmp start
 	    label(goal) + // goal:
 	    convertStatements(tl, env)
-	  case If(expr, ifStatements) =>
+	  case If(cmp, ifStatements) =>
 	    val goal = generateLabel()
-	    convertExpr(expr, env) + // push expr
-	    (zero + one + prpr + floatToPrprString(goal)) + // ifzero goal
+	    convertCmp(cmp, env, goal) +
 	    convertStatements(ifStatements, env) +
 	    label(goal) + // goal:
 	    convertStatements(tl, env)
@@ -134,6 +133,30 @@ class MyPrprCompiler {
 	}
       }
       case _ => end
+    }
+  }
+
+  // 比較を評価して真だったらtrueLabelにジャンプしない表現を返す
+  def convertCmp(cmp: Cmp, env: List[String], trueLabel: Int) = {
+    cmp match {
+      case CmpEq(exp1, exp2) =>
+	val falseLabel = generateLabel()
+	convertExpr(exp1, env) +
+	convertExpr(exp2, env) +
+	sub +
+	jz(falseLabel) +
+	jmp(trueLabel) +
+	label(falseLabel)
+      case CmpLT(exp1, exp2) =>
+	val falseLabel = generateLabel()
+	convertExpr(exp1, env) +
+	convertExpr(exp2, env) +
+	sub +
+	jneg(falseLabel) +
+	jmp(trueLabel) +
+	label(falseLabel)
+      case _ =>
+	throw new RuntimeException("not implemented.")
     }
   }
 

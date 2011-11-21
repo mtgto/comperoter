@@ -93,11 +93,11 @@ class PrprParserSuite extends FunSuite {
     val one = compiler.one
     
     println("programs[1] = " + compiler.convert(parsedProgram("printInt 10+20*30;")))
-    println("programs[2] = " + compiler.convert(parsedProgram("while (1) { printInt 42; }")))
+    println("programs[2] = " + compiler.convert(parsedProgram("while (1 < 2) { printInt 42; }")))
     println("programs[3] = " + compiler.convert(parsedProgram("var x = 10;")))
     println("programs[4] = " + compiler.convert(parsedProgram("var x = 10; printInt x;")))
     println("programs[5] = " + compiler.convert(parsedProgram("var x = 10; var y = 20; printInt y; printInt x;")))
-    println("programs[6] = " + compiler.convert(parsedProgram("var x = 10; while (x) { printInt x; x = x - 1;}")))
+    println("programs[6] = " + compiler.convert(parsedProgram("var x = 10; while (0 < x) { printInt x; x = x - 1;}")))
     println("programs[7] = " + compiler.convert(parsedProgram("var a = f(10);")))
     println("programs[8] = " + compiler.convert(parsedProgram("def f(a, b) { return a + b; }")))
     println("programs[9] = " + compiler.convert(parsedProgram("printInt f(10, 20); def f(a, b) { return a + b; }")))
@@ -105,6 +105,7 @@ class PrprParserSuite extends FunSuite {
     println("programs[11] = " + compiler.convert(parsedProgram("var a = 10; printInt f(20, a); def f(a, b) { var c = 30; var d = 40; return a + b + c; }"))) // ng
     println("programs[12] = " + compiler.convert(parsedProgram("var a = 10; printInt f(10, 20); def f(a, b) { var c = 30; var d = 40; return a + b + c; }"))) // ok
     println("programs[13] = " + compiler.convert(parsedProgram("var a = 10; var b = 20; var c = 30; var d = 40; var e = 50; printInt f(a, b, c, d, e); printInt 9999; printInt 9999; def f(a, b, c, d, e) { var f = 60; var g = 70; return a + b + c + d + e + f + g; }"))) // ok
+    println("programs[14] = " + compiler.convert(parsedProgram("var a = 1; while (a < 100) { if (a%3 < 1) { printChar 70;} if (a%5 < 1) { printChar 66; } if (0 < (a%3)*(a%5)) { printChar 66; printInt a; } printChar 65; a = a + 1; }")))
     assert(false)
   }
 }
