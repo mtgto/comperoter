@@ -20,15 +20,18 @@ class PrprParserSuite extends FunSuite {
     assert(parsedNum(parser.one + (parser.zero * 32) + prpr) === Some(4294967296F))
   }
   
-  test("parser") {
+  test("parser can parse encoded command") {
     val prpr = "あずにゃん"
     val parser = new PrprParser(prpr)
-    val isParsed = (in:String) =>
-      parser.parseAll(parser.program, in) match {
-	case parser.Success(_, _) => true
-	case _ => false
+    var zero = parser.zero
+    var one = parser.one
+    val parse = (in:String) =>
+      parser.parseAll(parser.command, in) match {
+	case parser.Success(result, _) => Some(result)
+	case _ => None
       }
-    assert(isParsed("あずにゃん"))
+    assert(parse(prpr) === None)
+    assert(parse(prpr + one + one + zero + one + zero + prpr) === Some(parser.Push(10F)))
   }
   
   test("expr") {
