@@ -2,6 +2,17 @@ import org.scalatest.FunSuite
 import scala.collection.mutable.Stack
  
 class PrprParserSuite extends FunSuite {
+  test("parser") {
+    val prpr = "あずにゃん"
+    val parser = new PrprParser(prpr)
+    val isParsed = (in:String) =>
+      parser.parseAll(parser.program, in) match {
+	case parser.Success(_, _) => true
+	case _ => false
+      }
+    assert(isParsed("あずにゃん"))
+  }
+  
   test("expr") {
     val parser = new MyParser
     val parsedExpr = (in:String) =>

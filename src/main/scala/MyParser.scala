@@ -8,9 +8,7 @@ case class Program(stts:List[Stt])
 /**
  * 文
  */
-trait Stt {
-  
-}
+trait Stt
 
 case class Define(name:String, value:Exp) extends Stt // 変数宣言
 case class Substitute(name:String, value:Exp) extends Stt // 代入
@@ -23,8 +21,7 @@ case class Return(exp:Exp) extends Stt
 /**
  * 式
  */
-trait Exp {
-}
+trait Exp
 
 case class Var(name:String) extends Exp // 変数
 case class Num(digit:Float) extends Exp // 定数(数値)
