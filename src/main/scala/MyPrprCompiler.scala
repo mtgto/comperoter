@@ -116,7 +116,7 @@ class MyPrprCompiler {
 	  case Return(expr) =>
 	    convertExpr(expr, env) // 親関数のゴール地点にジャンプする
 	  case Function(name, args, stts) =>
-	    val converted = convertStatements(tl, env)
+	    val converted = convertStatements(tl, env) + end
 	    val funcTuple = generateFuncLabelTuple(name)
 	    println("backLabels="+funcBackLabels(name))
 	    converted +
@@ -132,7 +132,7 @@ class MyPrprCompiler {
 	    throw new RuntimeException("not implemented.")
 	}
       }
-      case _ => end
+      case _ => ""
     }
   }
 
@@ -195,12 +195,6 @@ class MyPrprCompiler {
 	label(returnLabel)
 	if (args.length > 0) {
 	  println("args="+args+",env="+env)
-	  /*
-	  push(0) + loadbase + push(env.length) + add + dup + push(0) + storebase +
-	  args.map(dup+push(env.length-1)+add+convertExpr(_, env)+swap+storebase+push(1)+add).reduceLeft(_+_) +
-	  converted +
-	  pop + push(0) + loadbase + push(env.length) + sub + push(0) + storebase
-	  */
 	  push(0) + loadbase +
 	  args.map(dup+push(env.length)+add+convertExpr(_, env)+swap+storebase+push(1)+add).reduceLeft(_+_) +
 	  pop + push(0) + loadbase + push(env.length) + add + push(0) + storebase +
