@@ -1,5 +1,7 @@
 package prpr
 
+import scala.annotation.tailrec
+
 class Runner(prpr:String) {
   def generateLabelMap(commands:List[PrprCommand], map:Map[Float, List[PrprCommand]]):Map[Float, List[PrprCommand]] = {
     commands match {
@@ -24,7 +26,8 @@ class Runner(prpr:String) {
     }
   }
 
-  def executeCommands(commands:List[PrprCommand], stack:List[Float], heap:Map[Int, Float], labelMap:Map[Float, List[PrprCommand]]): Unit = {
+  @tailrec
+  private def executeCommands(commands:List[PrprCommand], stack:List[Float], heap:Map[Int, Float], labelMap:Map[Float, List[PrprCommand]]): Unit = {
     commands match {
       case hd::tl => {
 	hd match {
