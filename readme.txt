@@ -58,6 +58,16 @@ var x, iが定義されていたら文を評価するときにはスタックの
 
 ラベル名は遅延評価で出したいなあ
 
+ペログラム言語の処理系を作った。
+・ラベル名から残りのコマンドリストへのマップを作った
+・スタックやヒープを見て、操作が不能なときには例外投げる
+・末尾再帰を明記しないとスタックオーバーフローする
+
+Play!を使ってAPIを作る
+・webも作りたいけど80ポートはApacheに取られてる
+・mod_proxy使うかー
+　http://www.playframework.org/documentation/1.2.3/production#SetupwithApache
+
 Program::= List[Statement]
 Statement::= FUNC | DEF | SUBSTITUTE | WHILE | IF | PRINT | (RETURN)
 FUNC::= def FUNCNAME({VAR}) { Statement* } // 引数 + 実装
