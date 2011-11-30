@@ -3,9 +3,6 @@ package prpr
 import scala.annotation.tailrec
 
 class Runner(prpr:String) {
-  var in = Console.in
-  var out = Console.out
-
   def generateLabelMap(commands:List[PrprCommand], map:Map[Float, List[PrprCommand]]):Map[Float, List[PrprCommand]] = {
     commands match {
       case hd::tl =>
