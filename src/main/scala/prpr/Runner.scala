@@ -3,6 +3,9 @@ package prpr
 import scala.annotation.tailrec
 
 class Runner(prpr:String) {
+  var in = Console.in
+  var out = Console.out
+
   def generateLabelMap(commands:List[PrprCommand], map:Map[Float, List[PrprCommand]]):Map[Float, List[PrprCommand]] = {
     commands match {
       case hd::tl =>
@@ -19,6 +22,7 @@ class Runner(prpr:String) {
     val parseResult = parser.parseAll(parser.program, source)
     parseResult match {
       case parser.Success(commands, _) =>
+	//println(commands)
 	val labelMap = generateLabelMap(commands, Map())
 	executeCommands(commands, List(), Map(), labelMap)
       case _ =>
@@ -30,6 +34,7 @@ class Runner(prpr:String) {
   private def executeCommands(commands:List[PrprCommand], stack:List[Float], heap:Map[Int, Float], labelMap:Map[Float, List[PrprCommand]]): Unit = {
     commands match {
       case hd::tl => {
+	//println("cmd="+hd+",stack="+stack+",heap="+heap)
 	hd match {
 	  case command:ZeroStackCommand =>
 	    command match {
@@ -45,7 +50,7 @@ class Runner(prpr:String) {
 		    throw new RuntimeException("no label is defined")
 		}
 	      case End() =>
-		println("finished")
+		()
 	      case ReadChar() =>
 		print("Please input character: ")
 		val char = readLine().head.toFloat
@@ -128,7 +133,7 @@ class Runner(prpr:String) {
 	}
       }
       case _ =>
-	println("finished")
+	()
     }
   }
 }
