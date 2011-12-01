@@ -71,8 +71,8 @@ Play!を使ってAPIを作る
 Program::= List[Statement]
 Statement::= FUNC | DEF | SUBSTITUTE | WHILE | IF | PRINT | (RETURN)
 FUNC::= def FUNCNAME({VAR}) { Statement* } // 引数 + 実装
-DEF: var ID = EXP;
-SUBSTITUTDE: ID = EXP; // 代入
+DEF::= var ID = EXP
+SUBSTITUTDE::= ID = EXP; // 代入
 WHILE: while (EXP) { Statement* } // whileループ
 IF: if (EXP) { Statement* } // if文(式にするべき？)
 PRINT_INT: printInt NUM;
@@ -83,7 +83,7 @@ EXP::= VAR |
        NUM |
        ( EXP ) |
         EXP + EXP | EXP - EXP | EXP * EXP | EXP / EXP | EXP % EXP |
-	VAR(EXP*)
+	VAR(EXP*) | readInt() | readChar()
 
 mod
 jmpifzero fizz

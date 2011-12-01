@@ -8,7 +8,7 @@ case class Program(stts:List[Stt])
 /**
  * 文
  */
-trait Stt
+sealed trait Stt
 
 case class Define(name:String, value:Exp) extends Stt // 変数宣言
 case class Substitute(name:String, value:Exp) extends Stt // 代入
@@ -21,7 +21,7 @@ case class Return(exp:Exp) extends Stt
 /**
  * 式
  */
-trait Exp
+sealed trait Exp
 
 case class Var(name:String) extends Exp // 変数
 case class Num(digit:Float) extends Exp // 定数(数値)
@@ -31,8 +31,10 @@ case class Multiply(exp1:Exp, exp2:Exp) extends Exp
 case class Divide(exp1:Exp, exp2:Exp) extends Exp
 case class Modulo(exp1:Exp, exp2:Exp) extends Exp
 case class Call(name:String, args:List[Exp]) extends Exp // 関数呼び出し
+case class ReadChar() extends Exp
+case class ReadInt() extends Exp
 
-trait Cmp
+sealed trait Cmp
 case class CmpEq(exp1:Exp, exp2:Exp) extends Cmp // exp1 == exp2
 case class CmpLT(exp1:Exp, exp2:Exp) extends Cmp // exp1 
 
@@ -96,6 +98,8 @@ class MyParser extends JavaTokenParsers {
   def factor: Parser[Exp] =
     "("~>expr<~")" |
   """[1-9][0-9]*|0""".r ^^ {case a => Num(a.toFloat)} |
+  "readInt" <~ ("(" ~ ")") ^^ {case _ => ReadInt()} |
+  "readChar" <~ ("(" ~ ")") ^^ {case _ => ReadChar()} |
   """[a-zA-Z]+""".r~"("~repsep(expr, ",")~")"^^ {
     case funcName ~ "(" ~ args ~ ")" => Call(funcName, args)
   } | """[a-zA-Z]+""".r ^^ { Var(_) }

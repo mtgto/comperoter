@@ -203,6 +203,10 @@ class MyPrprCompiler {
 	} else {
 	  converted
 	}
+      case ReadInt() =>
+	one + prpr + one + zero
+      case ReadChar() =>
+	one + prpr + one + prpr
     }
   }
 

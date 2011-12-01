@@ -2,7 +2,7 @@ import org.scalatest.FunSuite
 import scala.collection.mutable.Stack
  
 class PrprParserSuite extends FunSuite {  
-  test("expr") {
+  test("parser can parse expressions") {
     val parser = new MyParser
     val parsedExpr = (in:String) =>
       parser.parseAll(parser.expr, in) match {
@@ -21,6 +21,10 @@ class PrprParserSuite extends FunSuite {
     assert(parsedExpr("func(1, 2, 3)"));
     assert(parsedExpr("func()"));
     assert(parsedExpr("func(a)"));
+    assert(!parsedExpr("readInt)"));
+    assert(parsedExpr("readInt()"));
+    assert(!parsedExpr("readChar("));
+    assert(parsedExpr("readChar()"));
     assert(parsedStatement("return x;"))
     assert(parsedStatement("def f(a, b, c) { printInt a+b-c; return c; }"))
   }
@@ -51,6 +55,7 @@ class PrprParserSuite extends FunSuite {
     assert(prpr + one + one + prpr === compiler.convertExpr(parsedExpr("1"), List()))
     assert(prpr + one + one + zero + prpr === compiler.convertExpr(parsedExpr("2"), List()))
     assert(prpr + one + one + zero + zero + prpr === compiler.convertExpr(parsedExpr("4"), List()))
+    assert(prpr + one + one + zero + zero + prpr === compiler.convertExpr(parsedExpr("((4))"), List()))
 
     // 加算
     assert((prpr + one + one + prpr) + // push 1
