@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8"/>
+    <link rel="stylesheet" href="bootstrap.min.css"/>
+    <script src="jquery-1.7.1.min.js"></script>
+    <script src="bootstrap-tabs.js"></script>
+    <title>Comperoter</title>
+    <style type="text/css">
+      .header {
+        padding-top: 50px;
+      }
+      section {
+      padding-top: 60px;
+      }
+      .footer {
+        padding-bottom: 50px;
+      }
+    </style>
+  </head>
+  <body>    
+    <div class="topbar">
+      <div class="topbar-inner">
+	<div class="container">
+	  <a class="brand" href="#">Comperoter</a>
+	  <ul class="nav">
+	    <li class="active"><a href="#overview">Overview</a></li>
+	    <li><a href="#compile">Compile</a></li>
+	    <li><a href="#execute">Execute</a></li>
+	  </ul>
+	</div>
+      </div>
+    </div>
+
+    <header id="overview" class="header">
+      <div class="inner">
+        <div class="container">
+          <h1>Comperoter</h1>
+          <p class="lead">
+	    手続き型っぽいプログラミング言語で書いたプログラムを <a href="http://mithrilworks.jp/neta/perogramming.html">ペログラム言語</a> に変換します。<br/>
+	    変換したコードを実行することも出来ます。<br/>
+	    2012年12月10日(土)に <a href="http://partake.in/events/7b7f6551-8683-4968-855f-f8a62ec4bc93">第二回Scala会議</a> でLTをしました。<br/>
+	    ソースコードは <a href="http://github.com/mtgto">GitHub</a> から取得できます。<br/>
+	    当日使用したスライドは <a onclick="alert('TODO')">SlideShare</a> にアップロードしています。
+	  </p>
+        </div>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="compile">
+	<div class="page-header">
+	  <h1>Compile</h1>
+	</div>
+	<div class="container">
+	  <div class="row">
+	    <div class="span9">
+	      <form method="post" class="form-stacked">
+		<fieldset>
+		  <div class="clearfix">
+		    <label for="target">ペロペロ対象</label>
+		    <div class="input">
+		      <input class="span8" name="target" value="あずにゃん"/>
+		    </div>
+		  </div>
+		  <div class="clearfix">
+		    <label for="program">プログラム</label>
+		    <div class="input">
+		      <textarea name="program" class="span8" rows="15" placeholder="ここにプログラムを記述します"></textarea>
+		    </div>
+		  </div>
+		</fieldset>
+		<div class="actions">
+		  <input type="submit" class="btn primary" value="送信"/>
+		  <button type="reset" class="btn">クリア</button>
+		</div>
+	      </form>
+	    </div>
+	    <div class="span6">
+	      <ul class="tabs">
+		<li class="active"><a href="#tab-usage">Usage</a></li>
+		<li><a href="#tab-definition">Definition</a></li>
+		<li><a href="#tab-sample">Sample</a></li>
+	      </ul>
+	      <div class="pill-content">
+		<div class="active" id="tab-usage">
+		  プログラムのサンプル
+		  <pre class="prettyprint">
+		    <code>
+def func(a, b) {
+  return a+b;
+}
+var a = 30;
+var c = 40;
+printInt func(a+c);
+		    </code>
+		  </pre>
+		</div>
+		<div id="tab-definition">write language definition</div>
+		<div id="tab-sample">some sample?</div>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+      </section>
+
+      <section id="execute">
+	<div class="page-header">
+	  <h1>Execute</h1>
+	</div>
+	<div class="container">
+	  <div class="row">
+	    <div class="span9">
+	      <form method="post" class="form-stacked">
+		<fieldset>
+		  <div class="clearfix">
+		    <label for="pero-program">プログラム</label>
+		    <div class="input">
+		      <textarea name="pero-program" class="span8" rows="10"></textarea>
+		    </div>
+		  </div>
+		</fieldset>
+		<div class="actions">
+		  <input type="submit" class="btn primary" value="実行"/>
+		</div>
+	      </form>
+	    </div>
+	    <div class="span6">
+	      <form class="form-stacked">
+		<fieldset>
+		  <div class="clearfix">
+		    <label for="pero-execute">実行結果</label>
+		    <div class="input">
+		      <textarea class="span6" rows="10" name="pero-execute">あずにゃんペロペロ</textarea>
+		    </div>
+		  </div>
+		</fieldset>
+	      </form>
+	    </div>
+	  </div>
+	</div>
+      </section>
+    </div>
+
+    <footer class="footer">
+      <div class="container">
+	以下の方々、プロジェクトに感謝を：
+	<ul>
+	  <li>おもしろい言語を作ってくれた <a href="http://gplus.to/giemsa">蕎麦粉ぎむざ</a> さん</li>
+	  <li>綺麗なCSS, JavaScriptを提供してくれている <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap</a></li>
+	  <li>あずにゃん</li>
+	</ul>
+	なにかありましたら <a href="http://twitter.com/mtgto">@mtgto</a> まで
+      </div>
+    </footer>
+  </body>
+  <script>
+    $(function () {
+    $('.tabs').tabs()
+    })
+  </script>
+</html>
