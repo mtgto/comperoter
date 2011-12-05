@@ -7,6 +7,7 @@ scalaVersion := "2.9.1"
 seq(webSettings :_*)
 
 libraryDependencies ++= Seq(
+  "net.debasishg" %% "sjson" % "0.15",
   "org.scalatra" %% "scalatra" % "2.0.2",
   "org.scalatra" %% "scalatra-scalate" % "2.0.2",
   "org.scalatra" %% "scalatra-specs2" % "2.0.2" % "test",

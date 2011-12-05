@@ -160,16 +160,17 @@ printInt func(a+c);
     });
     $(function (){
       $('#form-compile').submit(function(){
-        alert($('#form-compile textarea').val());
-/*
         $.post(
-          '/compile',
+          'http://localhost:8080/compile',
           {'program' : $('#form-compile textarea').val()},
           function(data, status) {
-            alert(data);
-          }
+            if (data['status'] == 'ok') {
+              //alert(data['detail']['program']);
+            } else {
+              alert(data['detail']['description']);
+            }
+          }, "json"
         );
-*/
         return false;
       });
     });
