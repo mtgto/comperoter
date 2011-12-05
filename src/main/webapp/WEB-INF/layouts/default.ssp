@@ -111,7 +111,7 @@ printInt func(a+c);
 	<div class="container">
 	  <div class="row">
 	    <div class="span9">
-	      <form method="post" class="form-stacked">
+	      <form method="post" class="form-stacked" id="form-execute">
 		<fieldset>
 		  <div class="clearfix">
 		    <label for="pero-program">プログラム</label>
@@ -161,11 +161,12 @@ printInt func(a+c);
     $(function (){
       $('#form-compile').submit(function(){
         $.post(
-          'http://localhost:8080/compile',
+          '/compile',
           {'program' : $('#form-compile textarea').val()},
           function(data, status) {
             if (data['status'] == 'ok') {
-              //alert(data['detail']['program']);
+              $('#form-execute textarea').val(data['detail']['program']);
+              $('html,body').animate({scrollTop: $('#execute').offset().top})
             } else {
               alert(data['detail']['description']);
             }
