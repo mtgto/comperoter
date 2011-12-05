@@ -142,16 +142,14 @@ printInt func(a+c);
       </section>
     </div>
 
-    <footer class="footer">
-      <div class="container">
-	以下の方々、プロジェクトに感謝を：
-	<ul>
-	  <li>おもしろい言語を作ってくれた <a href="http://gplus.to/giemsa">蕎麦粉ぎむざ</a> さん</li>
-	  <li>綺麗なCSS, JavaScriptを提供してくれている <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap</a></li>
-	  <li>あずにゃん</li>
-	</ul>
-	なにかありましたら <a href="http://twitter.com/mtgto">@mtgto</a> まで
-      </div>
+    <footer class="footer container">
+      以下の方々、プロジェクトに感謝を：
+      <ul>
+	<li>おもしろい言語を作ってくれた <a href="http://gplus.to/giemsa">蕎麦粉ぎむざ</a> さん</li>
+	<li>綺麗なCSS, JavaScriptを提供してくれている <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap</a></li>
+	<li>あずにゃん</li>
+      </ul>
+      なにかありましたら <a href="http://twitter.com/mtgto">@mtgto</a> まで
     </footer>
   </body>
   <script>
