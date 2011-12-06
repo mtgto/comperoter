@@ -173,6 +173,18 @@ printInt func(a+c);
         return false;
       });
     });
+    $(function(){
+      $('#form-execute').submit(function(){
+        data = $('#form-execute textarea').val();
+        target = $('#form-compile input').val();
+        try {
+          executor.execute(data, target);
+        } catch (x) {
+          console.log(x);
+        }
+        return false;
+      });
+    });
   </script>
 </html>
 
