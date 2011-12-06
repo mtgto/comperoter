@@ -25,14 +25,15 @@ var executor = {
 	this.source = source;
 	this.pos = 0;
 	this.len = this.source.length;
+	this.labels = new Array();
 	var program = this.parse();
 	
 	this.stack = new Array();
 	this.heap = new Array();
-	this.labels = new Array();
 	this.pc = 0;
 	this.output = '';
 	while (this.pc < program.length) {
+	    console.log(program[this.pc]);
 	    program[this.pc]();
 	}
 	return this.output;
@@ -179,8 +180,7 @@ var executor = {
 			    executor.stack.push(num);
 			    executor.pc++;
 			}
-		    }
-		);
+		    }(this));
 	    } else if (fst == '0' && snd == 'P' && trd == 'P') {
 		// label
 		num = this.readNum();
@@ -229,7 +229,12 @@ var executor = {
 			}
 		    }(this, num));
 	    } else if (fst == '0' && snd == '0' && trd == '0') {
-		// end
+		program.push(
+		    function(executor){
+			return function(){
+			    executor.pc = 100000000;
+			}
+		    }(this, num));
 	    } else if (fst == '1' && snd == 'P' && trd == 'P') {
 		fth = this.read();
 		if (fth == '0') {
