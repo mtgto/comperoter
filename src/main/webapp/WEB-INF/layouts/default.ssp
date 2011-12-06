@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="bootstrap.min.css"/>
     <script src="jquery-1.7.1.min.js"></script>
     <script src="bootstrap-tabs.js"></script>
+    <script src="comperoter.js"></script>
     <title>Comperoter</title>
     <style type="text/css">
       .header {
