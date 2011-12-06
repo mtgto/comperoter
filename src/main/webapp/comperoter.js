@@ -1,16 +1,23 @@
 var executor = {
-    target: "",
-    source: "",
+    target: '',
+    source: '',
     pos: 0,
     len: 0,
-    program: "",
-    stack: "",
-    heap: "",
-    labels: "",
+    program: '',
+    stack: '',
+    heap: '',
+    labels: '',
     pc: 0,
-    
+    ERROR_EMPTY:{},
+    ERROR_PARSE:{},
+    ERROR_LABEL:{},
+    output: '',
+
     execute: function(source, target) {
 	this.target = target;
+	this.ERROR_EMPTY = new Error('stack is empty');
+	this.ERROR_PARSE = new Error('failed to parse');
+	this.ERROR_LABEL = new Error('tried to jump to not defined label');
 	var source = source.replace(/ﾍﾟﾛ/g, "0").replace(/ペロ/g, "1");
 	while (source.indexOf(this.target) >= 0) {
 	    source = source.replace(this.target, 'P');
@@ -18,22 +25,19 @@ var executor = {
 	this.source = source;
 	this.pos = 0;
 	this.len = this.source.length;
+	var program = this.parse();
+	
 	this.stack = new Array();
 	this.heap = new Array();
 	this.labels = new Array();
 	this.pc = 0;
-	var program = this.parse();
-	console.log(program[0]);
-	console.log(program[0]());
-	/*
+	this.output = '';
 	while (this.pc < program.length) {
 	    program[this.pc]();
 	}
-	 */
+	return this.output;
     },
     parse: function() {
-	const ERROR_EMPTY = 'stack is empty';
-	const ERROR_PARSE = 'failed to parse';
 	var program = new Array();
 	while (this.pos < this.len) {
 	    var fst = this.read();
@@ -57,176 +61,199 @@ var executor = {
 		    function(executor){
 			return function(){
 			    if (executor.stack.length == 0)
-				throw new Exception(ERROR_EMPTY);
+				throw executor.ERROR_EMPTY;
 			    executor.stack.push(executor.stack[executor.stack.length-1]);
 			    executor.pc++;
 			}
 		    }(this));
 	    } else if (fst == 'P' && snd == '0' && trd == '1') {
 		program.push(
-		    function(){
-			if (this.stack.length < 2)
-			    throw new Exception(ERROR_EMPTY);
-			var fst = this.stack.pop();
-			var snd = this.stack.pop();
-			this.stack.push(fst);
-			this.stack.push(snd);
-			this.pc++;
-		    }
-		);
+		    function(executor){
+			return function(){
+			    if (executor.stack.length < 2)
+				throw executor.ERROR_EMPTY;
+			    var fst = executor.stack.pop();
+			    var snd = executor.stack.pop();
+			    executor.stack.push(fst);
+			    executor.stack.push(snd);
+			    executor.pc++;
+			}
+		    }(this));
 	    } else if (fst == 'P' && snd == '0' && trd == '0') {
 		program.push(
-		    function(){
-			if (this.stack.length < 1)
-			    throw new Exception(ERROR_EMPTY);
-			this.stack.pop();
-			this.pc++;
-		    }
-		)
+		    function(executor){
+			return function(){
+			    if (executor.stack.length < 1)
+				throw executor.ERROR_EMPTY;
+			    executor.stack.pop();
+			    executor.pc++;
+			}
+		    }(this));
 	    } else if (fst == '1' && snd == '0' && trd == 'P') {
 		fth = this.read();
 		if (fth == 'P') {
 		    program.push(
-			function(){
-			    if (this.stack.length < 2)
-				throw new Exception(ERROR_EMPTY);
-			    var fst = this.stack.pop();
-			    var snd = this.stack.pop();
-			    this.stack.push(snd+fst);
-			    this.pc++;
-			}
-		    );
+			function(executor){
+			    return function(){
+				if (executor.stack.length < 2)
+				    throw executor.ERROR_EMPTY;
+				var fst = executor.stack.pop();
+				var snd = executor.stack.pop();
+				executor.stack.push(snd+fst);
+				executor.pc++;
+			    }
+			}(this));
 		} else if (fth == '1') {
 		    program.push(
-			function(){
-			    if (this.stack.length < 2)
-				throw new Exception(ERROR_EMPTY);
-			    var fst = this.stack.pop();
-			    var snd = this.stack.pop();
-			    this.stack.push(snd-fst);
-			    this.pc++;
-			}
-		    );
+			function(executor){
+			    return function(){
+				if (executor.stack.length < 2)
+				    throw executor.ERROR_EMPTY;
+				var fst = executor.stack.pop();
+				var snd = executor.stack.pop();
+				executor.stack.push(snd-fst);
+				executor.pc++;
+			    }
+			}(this));
 		} else if (fth == '0') {
 		    program.push(
-			function(){
-			    if (this.stack.length < 2)
-				throw new Exception(ERROR_EMPTY);
-			    var fst = this.stack.pop();
-			    var snd = this.stack.pop();
-			    this.stack.push(snd*fst);
-			    this.pc++;
-			}
-		    );
+			function(executor){
+			    return function(){
+				if (executor.stack.length < 2)
+				    throw executor.ERROR_EMPTY;
+				var fst = executor.stack.pop();
+				var snd = executor.stack.pop();
+				executor.stack.push(snd*fst);
+				executor.pc++;
+			    }
+			}(this));
 		}
 	    } else if (fst == '1' && snd == '0' && trd == '1') {
 		fth = this.read();
 		if (fth == 'P') {
 		    program.push(
-			function(){
-			    if (this.stack.length < 2)
-				throw new Exception(ERROR_EMPTY);
-			    var fst = this.stack.pop();
-			    var snd = this.stack.pop();
-			    this.stack.push(snd/fst);
-			    this.pc++;
-			}
-		    );
+			function(executor){
+			    return function(){
+				if (executor.stack.length < 2)
+				    throw executor.ERROR_EMPTY;
+				var fst = executor.stack.pop();
+				var snd = executor.stack.pop();
+				executor.stack.push(snd/fst);
+				executor.pc++;
+			    }
+			}(this));
 		} else if (fth == '1') {
 		    program.push(
-			function(){
-			    if (this.stack.length < 2)
-				throw new Exception(ERROR_EMPTY);
-			    var fst = this.stack.pop();
-			    var snd = this.stack.pop();
-			    this.stack.push(snd%fst);
-			    this.pc++;
-			}
-		    );
+			function(executor){
+			    return function(){
+				if (executor.stack.length < 2)
+				    throw executor.ERROR_EMPTY;
+				var fst = executor.stack.pop();
+				var snd = executor.stack.pop();
+				executor.stack.push(snd%fst);
+				executor.pc++;
+			    }
+			}(this));
 		} else {
 		    throw new Exception(ERROR_PARSE);
 		}
 	    } else if (fst == '1' && snd == '1' && trd == 'P') {
 		program.push(
-		    function(){
-			if (this.stack.length < 2)
-			    throw new Exception(ERROR_EMPTY);
-			var fst = this.stack.pop();
-			var snd = this.stack.pop();
-			this.heap[Math.floor(fst)] = snd;
-			this.pc++;
-		    }
-		);
+		    function(executor){
+			return function(){
+			    if (executor.stack.length < 2)
+				throw executor.ERROR_EMPTY;
+			    var fst = executor.stack.pop();
+			    var snd = executor.stack.pop();
+			    executor.heap[Math.floor(fst)] = snd;
+			    executor.pc++;
+			}
+		    }(this));
 	    } else if (fst == '1' && snd == '1' && trd == '1') {
 		program.push(
-		    function(){
-			if (this.stack.length < 1)
-			    throw new Exception(ERROR_EMPTY);
-			var num = this.heap[Math.floor(this.stack.pop())];
-			this.stack.push(num);
-			this.pc++;
+		    function(executor){
+			return function(){
+			    if (executor.stack.length < 1)
+				throw executor.ERROR_EMPTY;
+			    var num = executor.heap[Math.floor(executor.stack.pop())];
+			    executor.stack.push(num);
+			    executor.pc++;
+			}
 		    }
 		);
 	    } else if (fst == '0' && snd == 'P' && trd == 'P') {
 		// label
 		num = this.readNum();
-		labels[num] = program.length;
+		this.labels[num] = program.length;
 	    } else if (fst == '0' && snd == 'P' && trd == '0') {
 		// jump
 		num = this.readNum();
 		program.push(
-		    function(){
-			this.pc = this.labels[num];
-		    }
-		);
+		    function(executor, label){
+			return function(){
+			    if (typeof executor.labels[label] === 'undefined')
+				throw executor.ERROR_LABEL;
+			    executor.pc = executor.labels[label];
+			}
+		    }(this, num));
 	    } else if (fst == '0' && snd == '1' && trd == 'P') {
 		// jzero
 		num = this.readNum();
 		program.push(
-		    function(){
-			if (this.stack.length < 1)
-			    throw new Exception(ERROR_EMPTY);
-			if (this.stack.pop() == 0)
-			    this.pc = this.labels[num];
-			else
-			    this.pc++;
-		    }
-		);
+		    function(executor, label){
+			return function(){
+			    if (executor.stack.length < 1)
+				throw executor.ERROR_EMPTY;
+			    if (typeof executor.labels[label] === 'undefined')
+				throw executor.ERROR_LABEL;
+			    if (executor.stack.pop() == 0)
+				executor.pc = executor.labels[num];
+			    else
+				executor.pc++;
+			}
+		    }(this, num));
 	    } else if (fst == '0' && snd == '1' && trd == '1') {
 		// jneg
 		num = this.readNum();
 		program.push(
-		    function(){
-			if (this.stack.length < 1)
-			    throw new Exception(ERROR_EMPTY);
-			if (this.stack.pop() < 0)
-			    this.pc = this.labels[num];
-			else
-			    this.pc++;
-		    }
-		);
+		    function(executor, label){
+			return function(){
+			    if (executor.stack.length < 1)
+				throw executor.ERROR_EMPTY;
+			    if (typeof executor.labels[label] === 'undefined')
+				throw executor.ERROR_LABEL;
+			    if (executor.stack.pop() < 0)
+				executor.pc = executor.labels[label];
+			    else
+				executor.pc++;
+			}
+		    }(this, num));
+	    } else if (fst == '0' && snd == '0' && trd == '0') {
+		// end
 	    } else if (fst == '1' && snd == 'P' && trd == 'P') {
 		fth = this.read();
 		if (fth == '0') {
 		    // printChar
 		    program.push(
-			function(){
-			    if (this.stack.length < 1)
-				throw new Exception(ERROR_EMPTY);
-			    console.log(String.fromCharCode(this.stack.pop()));
-			    this.pc++;
-			}
-		    );
+			function(executor){
+			    return function(){
+				if (executor.stack.length < 1)
+				    throw executor.ERROR_EMPTY;
+				executor.output += String.fromCharCode(executor.stack[executor.stack.length-1]);
+				executor.pc++;
+			    }
+			}(this));
 		} else if (fth == '1') {
 		    // printNum
 		    program.push(
-			function(){
-			    if (this.stack.length < 1)
-				throw new Exception(ERROR_EMPTY);
-			    console.log(this.stack.pop());
-			    this.pc++;
-			}
-		    );
+			function(executor){
+			    return function(){
+				if (executor.stack.length < 1)
+				    throw executor.ERROR_EMPTY;
+				executor.output += executor.stack[executor.stack.length-1];
+				executor.pc++;
+			    }
+			}(this));
 		} else {
 		    throw new Exception(ERROR_PARSE);
 		}

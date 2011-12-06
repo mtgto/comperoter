@@ -127,12 +127,12 @@ printInt func(a+c);
 	      </form>
 	    </div>
 	    <div class="span6">
-	      <form class="form-stacked">
+	      <form class="form-stacked" id="form-result">
 		<fieldset>
 		  <div class="clearfix">
-		    <label for="pero-execute">実行結果</label>
+		    <label for="pero-result">実行結果</label>
 		    <div class="input">
-		      <textarea class="span6" rows="10" name="pero-execute">あずにゃんペロペロ</textarea>
+		      <textarea class="span6" rows="10" name="pero-result"></textarea>
 		    </div>
 		  </div>
 		</fieldset>
@@ -179,7 +179,8 @@ printInt func(a+c);
         data = $('#form-execute textarea').val();
         target = $('#form-compile input').val();
         try {
-          executor.execute(data, target);
+          output = executor.execute(data, target);
+          $('#form-result textarea').val(output);
         } catch (x) {
           console.log(x);
         }
