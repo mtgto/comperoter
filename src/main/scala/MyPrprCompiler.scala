@@ -1,4 +1,4 @@
-class MyPrprCompiler {
+abstract class PrprCompiler extends CodeGenerator {
   val prpr = "あずにゃん"
   val one = "ペロ"
   val zero = "ﾍﾟﾛ"
@@ -15,27 +15,6 @@ class MyPrprCompiler {
   case class Jump(name: String) extends Converted
   // 上記以外
   case class Code(code: String) extends Converted
-
-  val push = (num: Int) => prpr + one + floatToPrprString(num)
-  val dup = prpr + zero + prpr
-  val swap = prpr + zero + one
-  val pop = prpr + zero + zero
-  val storebase = one + one + prpr
-  val store = (index: Int) => push(0) + loadbase + push(index) + add + storebase
-  val loadbase = one + one + one // load op
-  val load = (index: Int) => push(0) + loadbase + push(index) + add + loadbase // push heap[heap[0]+index]
-  val add = one + zero + prpr + prpr
-  val sub = one + zero + prpr + one
-  val mul = one + zero + prpr + zero
-  val div = one + zero + one + prpr
-  val mod = one + zero + one + one
-  val printInt = one + prpr + prpr + one + pop
-  val printChar = one + prpr + prpr + zero + pop
-  val label = (num: Int) => zero + prpr + prpr + floatToPrprString(num)
-  val jmp = (label: Int) => zero + prpr + zero + floatToPrprString(label)
-  val jz = (label: Int) => zero + one + prpr + floatToPrprString(label)
-  val jneg = (label: Int) => zero + one + one + floatToPrprString(label)
-  val end = zero + zero + zero
   
   def convert(program: Program) = {
     labelIndex = 0
@@ -184,7 +163,7 @@ class MyPrprCompiler {
 	val idx = find(env, 0)
 	load(idx)
       case Num(num) =>
-	prpr + one + floatToPrprString(num)
+	push(num.toInt)
       case Add(a, b) =>
 	convertExpr(a, env) + convertExpr(b, env) + add
       case Sub(a, b) =>
@@ -213,35 +192,13 @@ class MyPrprCompiler {
 	  converted
 	}
       case ReadInt() =>
-	one + prpr + one + zero
+	readInt
       case ReadChar() =>
-	one + prpr + one + prpr
-    }
-  }
-
-  def floatToPrprString(num: Float) = {
-    val numInt = num.toInt
-    if (numInt == 0)
-      zero + prpr
-    else
-      intToBinList(numInt).reverse.map(a => if (a==0) zero else one).foldRight(prpr)(_+_)
-  }
-
-  def intToBinList(num: Int): List[Int] = {
-    if (num == 0)
-      List()
-    else
-      num%2 :: intToBinList(num/2)
-  }
-
-  def compile(data: String) = {
-    val parseResult = parser.parseAll(parser.expr, data)
-    val compiler = new MyPrprCompiler
-    parseResult match {
-      case parser.Success(exp,_) =>
-	println(compiler.convertExpr(exp, List()))
-      case _ =>
-	println("failed to parse")
+	readChar
     }
   }
 }
+
+object MyPrprCompiler extends PrprCompiler with MyCodeGenerator
+
+object DebugPrprCompiler extends PrprCompiler with DebugCodeGenerator

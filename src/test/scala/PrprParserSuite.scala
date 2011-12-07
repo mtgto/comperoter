@@ -37,7 +37,7 @@ class PrprParserSuite extends FunSuite {
 	case _ => throw new RuntimeException("failed to parse expression: " + in)
       }
     
-    val compiler = new MyPrprCompiler
+    val compiler = MyPrprCompiler
     val prpr = compiler.prpr
     val zero = compiler.zero
     val one = compiler.one
@@ -88,6 +88,21 @@ class PrprParserSuite extends FunSuite {
 	     compiler.convertExpr(parsedExpr("10%4"), List()))
   }
 
+  test("compiler can compile into pseudo code") {
+    val parser = new MyParser
+    val parsedProgram = (in:String) =>
+      parser.parseAll(parser.program, in) match {
+	case parser.Success(program, _) => program
+	case _ => throw new RuntimeException("failed to parse a program: " + in)
+      }
+    val compiler = DebugPrprCompiler    
+    val compile = (in:String) => {
+      compiler.convert(parsedProgram(in))
+    }
+    assert("push(1);push(0);store;push(10);push(20);push(30);mul;add;printInt;" === compile("printInt 10+20*30;"))
+    assert("" === compile("def f(a){if (a<2){return 1;} return f(a-1);} printInt f(3);"))
+  }
+
   test("compiler can compile executable program") {
     val parser = new MyParser
     val parsedProgram = (in:String) =>
@@ -95,7 +110,7 @@ class PrprParserSuite extends FunSuite {
 	case parser.Success(program, _) => program
 	case _ => throw new RuntimeException("failed to parse a program: " + in)
       }
-    val compiler = new MyPrprCompiler
+    val compiler = MyPrprCompiler
     val id = compiler.prpr
     val zero = compiler.zero
     val one = compiler.one
@@ -125,6 +140,10 @@ class PrprParserSuite extends FunSuite {
 */
     assert("1 2 Fizz 4 Buzz Fizz 7 8 Fizz Buzz 11 Fizz 13 14 FizzBuzz 16 17 Fizz 19 Buzz Fizz 22 23 Fizz Buzz 26 Fizz 28 29 FizzBuzz 31 32 Fizz 34 Buzz Fizz 37 38 Fizz Buzz 41 Fizz 43 44 FizzBuzz 46 47 Fizz 49 Buzz Fizz 52 53 Fizz Buzz 56 Fizz 58 59 FizzBuzz 61 62 Fizz 64 Buzz Fizz 67 68 Fizz Buzz 71 Fizz 73 74 FizzBuzz 76 77 Fizz 79 Buzz Fizz 82 83 Fizz Buzz 86 Fizz 88 89 FizzBuzz 91 92 Fizz 94 Buzz Fizz 97 98 Fizz " === getOutput("var a = 1; while (a < 100) { if (a%3 < 1) { printChar 70; printChar 105; printChar 122; printChar 122; } if (a%5 < 1) { printChar 66; printChar 117; printChar 122; printChar 122; } if (0 < (a%3)*(a%5)) { printInt a; } printChar 32; a = a + 1; }"))
     assert("0123" === getOutput("def f(a){if (a<2){printInt(a);} return 123;} printInt f(0);"));
+    assert("123" === getOutput("def f(a,b,c){return 123;}printInt f(10,20,30);"))
+    assert("123" === getOutput("def f(a,b,c){if (a<10){return 124;}return 123;}printInt f(10,20,30);"))
+    assert("124" === getOutput("def f(a,b,c){if (a<20){return 124;}return 123;}printInt f(10,20,30);"))
+    assert("1" === getOutput("def f(a){if (a<100){return 1;} return f(a-1);} printInt f(3);"));
     assert("1" === getOutput("def f(a){if (a<2){return 1;} return f(a-1);} printInt f(3);"));
 /*
     assert("" === getOutput("""

@@ -23,7 +23,7 @@ class MyScalatraServlet extends ScalatraServlet with ScalateSupport {
     val result =
       parser.parseAll(parser.program, code) match {
 	case parser.Success(program, _) => {
-	  val compiler = new MyPrprCompiler
+	  val compiler = MyPrprCompiler
 	  Response("ok", Map("program"->compiler.convert(program)))
 	}
 	case parser.NoSuccess(message, _) => Response("fail", Map("description" -> message))
