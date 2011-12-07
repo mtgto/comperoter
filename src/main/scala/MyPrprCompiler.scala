@@ -41,7 +41,7 @@ class MyPrprCompiler {
     labelIndex = 0
     functions = collection.mutable.Map[String, (Int, Int)]()
     backLabels = collection.mutable.Map[String, collection.mutable.Set[(Int)]]()
-    push(1) + push(0) + storebase + convertStatements(program.stts, List())
+    push(1) + push(0) + storebase + convertStatements(program.stts, List(), -1)
   }
 
   var labelIndex = 0
@@ -70,7 +70,14 @@ class MyPrprCompiler {
     backLabels.getOrElse(funcName, Set())
   }
 
-  def convertStatements(stts: List[Stt], env: List[String]): String = {
+  /**
+   * 文の配列をコンパイルする
+   *
+   * @param stts 文の配列
+   * @param env 環境
+   * @param escapeLabel 関数の中のコンパイル中の時にreturnで飛ぶ先
+   */
+  def convertStatements(stts: List[Stt], env: List[String], escapeLabel:Int): String = {
     stts match {
       case hd::tl => {
 	hd match {
@@ -80,14 +87,14 @@ class MyPrprCompiler {
 	    else {
 	      val index = env.length
 	      val nextEnv = env ::: List(name)
-	      convertExpr(expr, env) + store(index) + convertStatements(tl, nextEnv)
+	      convertExpr(expr, env) + store(index) + convertStatements(tl, nextEnv, escapeLabel)
 	    }
 	  case Substitute(name, expr) =>
 	    val index = env.indexOf(name)
 	    if (index >= 0)
 	      convertExpr(expr, env) + // push expr
 	      store(index) + // heap[heap[0] + index] = stack[1]
-	      convertStatements(tl, env)
+	      convertStatements(tl, env, escapeLabel)
 	    else
 	      throw new RuntimeException("variable " + name + " is not defined.")
 	  case While(cmp, whileStatements) =>
@@ -95,33 +102,35 @@ class MyPrprCompiler {
 	    val goal = generateLabel() // ループ直後
 	    label(start) + // start:
 	    convertCmp(cmp, env, goal) +
-	    convertStatements(whileStatements, env) +
+	    convertStatements(whileStatements, env, escapeLabel) +
 	    jmp(start) + // jmp start
 	    label(goal) + // goal:
-	    convertStatements(tl, env)
+	    convertStatements(tl, env, escapeLabel)
 	  case If(cmp, ifStatements) =>
 	    val goal = generateLabel()
 	    convertCmp(cmp, env, goal) +
-	    convertStatements(ifStatements, env) +
+	    convertStatements(ifStatements, env, escapeLabel) +
 	    label(goal) + // goal:
-	    convertStatements(tl, env)
+	    convertStatements(tl, env, escapeLabel)
 	  case PrintNum(expr) =>
 	    convertExpr(expr, env) + // push expr
 	    printInt + // print_num
-	    convertStatements(tl, env)
+	    convertStatements(tl, env, escapeLabel)
 	  case PrintChar(expr) =>
 	    convertExpr(expr, env) + // push expr
 	    printChar + // print_char
-	    convertStatements(tl, env)
+	    convertStatements(tl, env, escapeLabel)
 	  case Return(expr) =>
-	    convertExpr(expr, env) // 親関数のゴール地点にジャンプする
+	    // 親関数のゴール地点にジャンプする
+	    convertExpr(expr, env) +
+	    jmp(escapeLabel)
 	  case Function(name, args, stts) =>
-	    val converted = convertStatements(tl, env) + end
+	    val converted = convertStatements(tl, env, escapeLabel) + end
 	    val funcTuple = generateFuncLabelTuple(name)
 	    Console.err.println("backLabels="+funcBackLabels(name))
 	    converted +
 	    label(funcTuple._1) +
-	    convertStatements(stts, args) +
+	    convertStatements(stts, args, funcTuple._2) +
 	    label(funcTuple._2) +
 	    swap + 
 	    (funcBackLabels(name).map(label => dup+push(label)+sub+jz(label)+pop).reduceLeftOption(_+_) match {

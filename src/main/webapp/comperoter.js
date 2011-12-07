@@ -33,6 +33,9 @@ var executor = {
 	this.pc = 0;
 	this.output = '';
 	while (this.pc < program.length) {
+	    console.log('pc='+this.pc);
+	    console.log('stack='+this.stack);
+	    console.log('heap='+this.heap);
 	    console.log(program[this.pc]);
 	    program[this.pc]();
 	}

@@ -124,5 +124,22 @@ class PrprParserSuite extends FunSuite {
     println("programs[11] = " + compiler.convert(parsedProgram("var a = 10; printInt f(20, a); def f(a, b) { var c = 30; var d = 40; return a + b + c; }"))) // ng
 */
     assert("1 2 Fizz 4 Buzz Fizz 7 8 Fizz Buzz 11 Fizz 13 14 FizzBuzz 16 17 Fizz 19 Buzz Fizz 22 23 Fizz Buzz 26 Fizz 28 29 FizzBuzz 31 32 Fizz 34 Buzz Fizz 37 38 Fizz Buzz 41 Fizz 43 44 FizzBuzz 46 47 Fizz 49 Buzz Fizz 52 53 Fizz Buzz 56 Fizz 58 59 FizzBuzz 61 62 Fizz 64 Buzz Fizz 67 68 Fizz Buzz 71 Fizz 73 74 FizzBuzz 76 77 Fizz 79 Buzz Fizz 82 83 Fizz Buzz 86 Fizz 88 89 FizzBuzz 91 92 Fizz 94 Buzz Fizz 97 98 Fizz " === getOutput("var a = 1; while (a < 100) { if (a%3 < 1) { printChar 70; printChar 105; printChar 122; printChar 122; } if (a%5 < 1) { printChar 66; printChar 117; printChar 122; printChar 122; } if (0 < (a%3)*(a%5)) { printInt a; } printChar 32; a = a + 1; }"))
+    assert("0123" === getOutput("def f(a){if (a<2){printInt(a);} return 123;} printInt f(0);"));
+    assert("1" === getOutput("def f(a){if (a<2){return 1;} return f(a-1);} printInt f(3);"));
+/*
+    assert("" === getOutput("""
+def fact(a){
+  if (a < 2) {return 1;}
+  return a * fact(a-1);
+}
+def func(a, b) {
+  return a+b;
+}
+var a = 30;
+var c = 40;
+printInt func(a, c);
+printInt fact(5);
+"""));
+*/
   }
 }

@@ -31,7 +31,7 @@ class Runner(prpr:String) {
   private def executeCommands(commands:List[PrprCommand], stack:List[Float], heap:Map[Int, Float], labelMap:Map[Float, List[PrprCommand]]): Unit = {
     commands match {
       case hd::tl => {
-	//println("cmd="+hd+",stack="+stack+",heap="+heap)
+	//Console.err.println("cmd="+hd+",stack="+stack+",heap="+heap)
 	hd match {
 	  case command:ZeroStackCommand =>
 	    command match {
@@ -47,6 +47,7 @@ class Runner(prpr:String) {
 		    throw new RuntimeException("no label is defined")
 		}
 	      case End() =>
+		//Console.err.println("stack: " + stack)
 		()
 	      case ReadChar() =>
 		print("Please input character: ")
