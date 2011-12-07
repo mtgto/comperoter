@@ -210,7 +210,7 @@ var executor = {
 			    if (typeof executor.labels[label] === 'undefined')
 				throw executor.ERROR_LABEL;
 			    if (executor.stack.pop() == 0)
-				executor.pc = executor.labels[num];
+				executor.pc = executor.labels[label];
 			    else
 				executor.pc++;
 			}
