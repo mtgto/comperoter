@@ -5,6 +5,8 @@
     <link rel="stylesheet" href="bootstrap.min.css"/>
     <script src="jquery-1.7.1.min.js"></script>
     <script src="bootstrap-tabs.js"></script>
+    <script src="bootstrap-alerts.js"></script>
+    <script src="bootstrap-twipsy.js"></script>
     <script src="comperoter.js"></script>
     <title>Comperoter</title>
     <style type="text/css">
@@ -16,6 +18,10 @@
       }
       .footer {
         padding-bottom: 50px;
+      }
+      div#tab-definition {
+        height: 300px;
+        overflow: scroll;
       }
     </style>
   </head>
@@ -38,7 +44,7 @@
         <div class="container">
           <h1>Comperoter</h1>
           <p class="lead">
-	    手続き型っぽいプログラミング言語で書いたプログラムを <a href="http://mithrilworks.jp/neta/perogramming.html">ペログラム言語</a> に変換します。<br/>
+	    手続き型っぽいプログラミング言語で書いたプログラムを <a href="http://mithrilworks.jp/neta/perogramming.html">ペログラム言語</a> に変換します<a href="#" data-placement="below" rel='twipsy' title='オリジナルのペログラム言語の実装では下方向へのラベルへのジャンプはできなかったのですが、このサイトでの実装では行うことができるものとしてコンパイルします'>*1</a>。<br/>
 	    変換したコードを実行することも出来ます。<br/>
 	    2011年12月10日(土)に <a href="http://partake.in/events/7b7f6551-8683-4968-855f-f8a62ec4bc93">第二回Scala会議</a> でLTをしました。<br/>
 	    ソースコードは <a href="http://github.com/mtgto">GitHub</a> から取得できます。<br/>
@@ -54,6 +60,10 @@
 	  <h1>Compile</h1>
 	</div>
 	<div class="container">
+	  <div class="alert-message warning" data-alert="alert">
+	    <a class="close" href="#">×</a
+	    <p></p>
+	  </div>
 	  <div class="row">
 	    <div class="span9">
 	      <form class="form-stacked" id="form-compile">
@@ -87,7 +97,6 @@
 		<div class="active" id="tab-usage">
 		  プログラムのサンプル
 		  <pre class="prettyprint">
-		    <code>
 def fact(a) {
   if (a < 2) {
      return 1;
@@ -101,10 +110,65 @@ var a = 30;
 var c = 40;
 printInt func(a, c);
 printInt fact(5);
-		    </code>
 		  </pre>
 		</div>
-		<div id="tab-definition">write language definition</div>
+		<div id="tab-definition">
+		  <dl>
+		    <dt>&lt;program&gt; ::=</dt>
+		    <dd>&lt;statement&gt;*</dd>
+		    <dt>&lt;statement&gt; ::=</dt>
+		    <dd>
+		      <ul>
+			<li>var &lt;id&gt; = &lt;expression&gt;; <small> --- 変数宣言</small></li>
+			<li>&lt;id&gt; = &lt;expression&gt;; <small> --- 変数への代入</small></li>
+			<li>while (&lt;compare-expression&gt;) {
+			  &lt;statement&gt;*
+			  }</li>
+			<li>if (&lt;compare-expression&gt;) { &lt;statement&gt;* }</li>
+			<li>printInt &lt;expression&gt;; <small> --- 数値の出力</small></li>
+			<li>printChar &lt;expression&gt;; <small> --- 文字の出力</small></li>
+			<li>return &lt;expression&gt;;</li>
+			<li>def &lt;id&gt;(&lt;arguments&gt;) { &lt;statement&gt;* } <small> --- 関数宣言</small></li>
+		      </ul>
+		    </dd>
+		    <dt>&lt;compare-expression&gt; ::=</dt>
+		    <dd>
+		      <ul>
+			<li>&lt;expression&gt; == &lt;expression&gt;</li>
+			<li>&lt;expression&gt; < &lt;expression&gt;</li>
+		      </ul>
+		    </dd>
+		    <dt>&lt;expression&gt; ::=</dt>
+		    <dd>
+		      <ul>
+			<li>&lt;expression2&gt; [ + &lt;expression&gt; ]</li>
+			<li>&lt;expression2&gt; [ - &lt;expression&gt; ]</li>
+		      </ul>
+		    </dd>
+		    <dt>&lt;expression2&gt; ::=</dt>
+		    <dd>
+		      <ul>
+			<li>&lt;expression3&gt; [ * &lt;expression2&gt; ]</li>
+			<li>&lt;expression3&gt; [ / &lt;expression2&gt; ]</li>
+			<li>&lt;expression3&gt; [ % &lt;expression2&gt; ]</li>
+		      </ul>
+		    </dd>
+		    <dt>&lt;expression3&gt; ::=</dt>
+		    <dd>
+		      <ul>
+			<li>&lt;id&gt; <small> --- 変数</small></li>
+			<li>&lt;number&gt; <small> --- 定数</small></li>
+			<li>(&lt;expression3&gt;)</li>
+		      </ul>
+		    </dd>
+		    <dt>&lt;arguments&gt; ::=</dt>
+		    <dd>&lt;id&gt; [, &lt;id&gt; ]</dd>
+		    <dt>&lt;id&gt; ::=</dt>
+		    <dd>[a-zA-Z]+</dd>
+		    <dt>&lt;number&gt; ::=</dt>
+		    <dd>[1-9][0-9]*|0</dd>
+		  </dl>
+		</div>
 		<div id="tab-sample">some sample?</div>
 	      </div>
 	    </div>
@@ -164,6 +228,9 @@ printInt fact(5);
     $(function () {
       $('.tabs').tabs()
     });
+    $(function () {
+      $("a[rel=twipsy]").twipsy()
+    })
     $(function (){
       $('#form-compile').submit(function(){
         $.post(
