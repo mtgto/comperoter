@@ -149,7 +149,6 @@ func_return:
 swap
 dup
 jz (call1 - stack[0]) call1
-pop
 dup
 jz (call2 - stack[0]) call1
 

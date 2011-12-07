@@ -106,13 +106,14 @@ abstract class PrprCompiler extends CodeGenerator {
 	  case Function(name, args, stts) =>
 	    val converted = convertStatements(tl, env, escapeLabel) + end
 	    val funcTuple = generateFuncLabelTuple(name)
+	    val convertedStatements = convertStatements(stts, args, funcTuple._2)
 	    Console.err.println("backLabels="+funcBackLabels(name))
 	    converted +
 	    label(funcTuple._1) +
-	    convertStatements(stts, args, funcTuple._2) +
+	    convertedStatements +
 	    label(funcTuple._2) +
 	    swap + 
-	    (funcBackLabels(name).map(label => dup+push(label)+sub+jz(label)+pop).reduceLeftOption(_+_) match {
+	    (funcBackLabels(name).map(label => dup+push(label)+sub+jz(label)).reduceLeftOption(_+_) match {
 	      case Some(a) => a
 	      case _ => ""
 	    })

@@ -100,7 +100,7 @@ class PrprParserSuite extends FunSuite {
       compiler.convert(parsedProgram(in))
     }
     assert("push(1);push(0);store;push(10);push(20);push(30);mul;add;printInt;" === compile("printInt 10+20*30;"))
-    assert("" === compile("def f(a){if (a<2){return 1;} return f(a-1);} printInt f(3);"))
+    assert("push(1);push(0);store;push(0);load;dup;push(0);add;push(3);swap;store;push(1);add;pop;push(0);load;push(0);add;push(0);store;push(0);jmp(101);label(0);pop;push(0);load;push(0);sub;push(0);store;printInt;end;label(101);load(0);push(2);sub;jneg(4);jmp(3);label(4);push(1);jmp(102);label(3);push(0);load;dup;push(1);add;load(0);push(1);sub;swap;store;push(1);add;pop;push(0);load;push(1);add;push(0);store;push(5);jmp(101);label(5);pop;push(0);load;push(1);sub;push(0);store;jmp(102);label(102);swap;dup;push(0);sub;jz(0);dup;push(5);sub;jz(5);" === compile("def f(a){if (a<2){return 1;} return f(a-1);} printInt f(3);"))
   }
 
   test("compiler can compile executable program") {
@@ -145,8 +145,7 @@ class PrprParserSuite extends FunSuite {
     assert("124" === getOutput("def f(a,b,c){if (a<20){return 124;}return 123;}printInt f(10,20,30);"))
     assert("1" === getOutput("def f(a){if (a<100){return 1;} return f(a-1);} printInt f(3);"));
     assert("1" === getOutput("def f(a){if (a<2){return 1;} return f(a-1);} printInt f(3);"));
-/*
-    assert("" === getOutput("""
+    assert("70120" === getOutput("""
 def fact(a){
   if (a < 2) {return 1;}
   return a * fact(a-1);
@@ -159,6 +158,5 @@ var c = 40;
 printInt func(a, c);
 printInt fact(5);
 """));
-*/
   }
 }
