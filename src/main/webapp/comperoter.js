@@ -11,7 +11,7 @@ var executor = {
     ERROR_EMPTY:{},
     ERROR_PARSE:{},
     ERROR_LABEL:{},
-	ERROR_INPUT:{},
+    ERROR_INPUT:{},
     output: '',
 
     execute: function(source, target) {
@@ -270,32 +270,32 @@ var executor = {
 	    } else if (fst == '1' && snd == 'P' && trd == '1') {
 		fth = this.read();
 		if (fth == 'P') {
-			// readChar
+		    // readChar
 		    program.push(
-				function(executor){
-					return function(){
-						var input = prompt("文字を入力してください")
-						if (input == null || input.length == 0)
-							throw executor.ERROR_INPUT;
-						executor.stack.push(input.charCodeAt(0));
-						executor.pc++;
-					}
-				}(this));
+			function(executor){
+			    return function(){
+				var input = prompt("文字を入力してください")
+				if (input == null || input.length == 0)
+				    throw executor.ERROR_INPUT;
+				executor.stack.push(input.charCodeAt(0));
+				executor.pc++;
+			    }
+			}(this));
 		} else if (fth == '0') {
 		    // readNum
-			program.push(
-				function(executor){
-					return function(){
-						var input = prompt("数値を入力してください")
-						if (input == null || input.length == 0)
-							throw executor.ERROR_INPUT;
-						var num = parseFloat(input);
-						if (isNaN(num))
-							throw executor.ERROR_INPUT;
-						executor.stack.push(num);
-						executor.pc++;
-					}
-				}(this));
+		    program.push(
+			function(executor){
+			    return function(){
+				var input = prompt("数値を入力してください")
+				if (input == null || input.length == 0)
+				    throw executor.ERROR_INPUT;
+				var num = parseFloat(input);
+				if (isNaN(num))
+				    throw executor.ERROR_INPUT;
+				executor.stack.push(num);
+				executor.pc++;
+			    }
+			}(this));
 		} else {
 		    throw this.ERROR_PARSE;
 		}
