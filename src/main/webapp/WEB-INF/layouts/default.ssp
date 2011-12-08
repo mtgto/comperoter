@@ -156,9 +156,12 @@ printInt fact(5);
 		    <dt>&lt;expression3&gt; ::=</dt>
 		    <dd>
 		      <ul>
+			<li>readInt(&lt;arguments&gt;) <small> --- 数値読み込み</small></li>
+			<li>readChar(&lt;arguments&gt;) <small> --- 一文字読み込み</small></li>
+			<li>&lt;id&gt;(&lt;arguments&gt;) <small> --- 関数呼び出し</small></li>
 			<li>&lt;id&gt; <small> --- 変数</small></li>
 			<li>&lt;number&gt; <small> --- 定数</small></li>
-			<li>(&lt;expression3&gt;)</li>
+			<li>(&lt;expression&gt;)</li>
 		      </ul>
 		    </dd>
 		    <dt>&lt;arguments&gt; ::=</dt>
