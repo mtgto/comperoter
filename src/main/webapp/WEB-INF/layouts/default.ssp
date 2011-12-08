@@ -44,7 +44,7 @@
         <div class="container">
           <h1>Comperoter</h1>
           <p class="lead">
-	    手続き型っぽいプログラミング言語で書いたプログラムを <a href="http://mithrilworks.jp/neta/perogramming.html">ペログラム言語</a> に変換します<a href="#" data-placement="below" rel='twipsy' title='オリジナルのペログラム言語の実装では下方向へのラベルへのジャンプはできなかったのですが、このサイトでの実装では行うことができるものとしてコンパイルします'>*1</a>。<br/>
+	    手続き型っぽいプログラミング言語で書いたプログラムを <a href="http://mithrilworks.jp/neta/perogramming.html">ペログラム言語</a> に変換します<a href="#" data-placement="below" rel='twipsy' title='オリジナルのペログラム言語の実装では下方向のラベルへのジャンプはできなかったのですが、このサイトでの実装では行うことができるものとしてコンパイルします'>*1</a>。<br/>
 	    変換したコードを実行することも出来ます。<br/>
 	    2011年12月10日(土)に <a href="http://partake.in/events/7b7f6551-8683-4968-855f-f8a62ec4bc93">第二回Scala会議</a> でLTをしました。<br/>
 	    ソースコードは <a href="http://github.com/mtgto">GitHub</a> から取得できます。<br/>
