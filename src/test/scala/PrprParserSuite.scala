@@ -157,6 +157,22 @@ var a = 30;
 var c = 40;
 printInt func(a, c);
 printInt fact(5);
-"""));
+"""))
+    assert("1:1 2:1 3:2 4:3 5:5 6:8 7:13 8:21 9:34 " === getOutput("""
+def fib(n) {
+  if (n < 3) {
+    return 1;
+  }
+  return fib(n-1) + fib(n-2);
+}
+var i = 1;
+while (i < 10) {
+  printInt i;
+  printChar 58;
+  printInt fib(i);
+  printChar 32;
+  i = i + 1;
+}
+"""))
   }
 }
