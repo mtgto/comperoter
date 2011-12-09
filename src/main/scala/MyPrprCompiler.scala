@@ -23,7 +23,7 @@ abstract class PrprCompiler extends CodeGenerator {
     functions.getOrElseUpdate(name, {
       val startLabel = generateLabel() + 100
       val goalLabel = generateLabel() + 100
-      Console.err.println("startLabel="+startLabel)
+      //Console.err.println("startLabel="+startLabel)
       (startLabel, goalLabel)
     })
   }
@@ -94,7 +94,7 @@ abstract class PrprCompiler extends CodeGenerator {
 	    val converted = convertStatements(tl, env, escapeLabel) + end
 	    val funcTuple = generateFuncLabelTuple(name)
 	    val convertedStatements = convertStatements(stts, args, funcTuple._2)
-	    Console.err.println("backLabels="+funcBackLabels(name))
+	    //Console.err.println("backLabels="+funcBackLabels(name))
 	    converted +
 	    label(funcTuple._1) +
 	    convertedStatements +
@@ -170,7 +170,7 @@ abstract class PrprCompiler extends CodeGenerator {
 	jmp(funcTuple._1) + // 関数ラベルへのジャンプ
 	label(returnLabel)
 	if (args.length > 0) {
-	  Console.err.println("args="+args+",env="+env)
+	  //Console.err.println("args="+args+",env="+env)
 	  push(0) + loadbase +
 	  args.map(dup+push(env.length)+add+convertExpr(_, env)+swap+storebase+push(1)+add).reduceLeft(_+_) +
 	  pop + push(0) + loadbase + push(env.length) + add + push(0) + storebase +
