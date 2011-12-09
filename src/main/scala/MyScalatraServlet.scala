@@ -5,8 +5,13 @@ import prpr._
 import dispatch.json._
 import sjson.json._
 import scala.reflect.BeanInfo
+import org.slf4j._
 
 class MyScalatraServlet extends ScalatraServlet with ScalateSupport {
+  val logger = LoggerFactory.getLogger(getClass)
+  before() {
+    logger.info(request.getRequestURI()+","+request.getRemoteAddr()+","+request.getHeader("Referer"))
+  }
 
   get("/") {
     contentType = "text/html"
@@ -17,6 +22,7 @@ class MyScalatraServlet extends ScalatraServlet with ScalateSupport {
     contentType ="text/json"
     val code = params("program")
     val target = params("target")
+    logger.info("code=\"" + code.replaceAll("[\\r\\n]", "\\\\n") + "\", target=\"" + target + "\"")
     import sjson.json.Serializer.SJSON
     @BeanInfo case class Response(status: String, detail: Map[String, String])
     val parser = new MyParser
