@@ -1,21 +1,8 @@
 abstract class PrprCompiler extends CodeGenerator {
-  val prpr = "あずにゃん"
   val one = "ペロ"
   val zero = "ﾍﾟﾛ"
   val parser = new MyParser
-  
-  // コンバートされた中間言語
-  trait Converted {
-    //def assemble():String
-  }
-
-  // コード後の位置に置かれるラベル
-  case class Label(code: String) extends Converted
-  // 関数へのジャンプ
-  case class Jump(name: String) extends Converted
-  // 上記以外
-  case class Code(code: String) extends Converted
-  
+    
   def convert(program: Program) = {
     labelIndex = 0
     functions = collection.mutable.Map[String, (Int, Int)]()
@@ -200,6 +187,8 @@ abstract class PrprCompiler extends CodeGenerator {
   }
 }
 
-object MyPrprCompiler extends PrprCompiler with MyCodeGenerator
+class MyPrprCompiler(target: String) extends {
+  val prpr = target
+} with PrprCompiler with MyCodeGenerator
 
 object DebugPrprCompiler extends PrprCompiler with DebugCodeGenerator

@@ -16,14 +16,14 @@ class MyScalatraServlet extends ScalatraServlet with ScalateSupport {
   post("/compile") {
     contentType ="text/json"
     val code = params("program")
+    val target = params("target")
     import sjson.json.Serializer.SJSON
-    //@BeanInfo case class Response(status: String, detail: Map[String, String])
     @BeanInfo case class Response(status: String, detail: Map[String, String])
     val parser = new MyParser
     val result =
       parser.parseAll(parser.program, code) match {
 	case parser.Success(program, _) => {
-	  val compiler = MyPrprCompiler
+	  val compiler = new MyPrprCompiler(target)
 	  Response("ok", Map("program"->compiler.convert(program)))
 	}
 	case parser.NoSuccess(message, _) => Response("fail", Map("description" -> message))

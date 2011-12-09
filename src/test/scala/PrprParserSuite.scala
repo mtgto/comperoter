@@ -37,7 +37,7 @@ class PrprParserSuite extends FunSuite {
 	case _ => throw new RuntimeException("failed to parse expression: " + in)
       }
     
-    val compiler = MyPrprCompiler
+    val compiler = new MyPrprCompiler("あずにゃん")
     val prpr = compiler.prpr
     val zero = compiler.zero
     val one = compiler.one
@@ -110,7 +110,7 @@ class PrprParserSuite extends FunSuite {
 	case parser.Success(program, _) => program
 	case _ => throw new RuntimeException("failed to parse a program: " + in)
       }
-    val compiler = MyPrprCompiler
+    val compiler = new MyPrprCompiler("pero")
     val id = compiler.prpr
     val zero = compiler.zero
     val one = compiler.one
