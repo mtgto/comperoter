@@ -35,10 +35,10 @@ var executor = {
 	this.pc = 0;
 	this.output = '';
 	while (this.pc < program.length) {
-	    console.log('pc='+this.pc);
-	    console.log('stack='+this.stack);
-	    console.log('heap='+this.heap);
-	    console.log(program[this.pc]);
+	    //console.log('pc='+this.pc);
+	    //console.log('stack='+this.stack);
+	    //console.log('heap='+this.heap);
+	    //console.log(program[this.pc]);
 	    program[this.pc]();
 	}
 	return this.output;
@@ -161,7 +161,7 @@ var executor = {
 			    }
 			}(this));
 		} else {
-		    throw new Exception(ERROR_PARSE);
+		    throw this.ERROR_PARSE;
 		}
 	    } else if (fst == '1' && snd == '1' && trd == 'P') {
 		program.push(
@@ -265,7 +265,7 @@ var executor = {
 			    }
 			}(this));
 		} else {
-		    throw new Exception(ERROR_PARSE);
+		    throw this.ERROR_PARSE;
 		}
 	    } else if (fst == '1' && snd == 'P' && trd == '1') {
 		fth = this.read();
@@ -305,7 +305,7 @@ var executor = {
     },
     read: function() {
 	if (this.pos >= this.len)
-	    throw new Exception("reached program end");
+	    throw this.ERROR_PARSE;
 	var ch = this.source[this.pos];
 	this.pos++;
 	return ch;

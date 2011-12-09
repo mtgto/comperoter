@@ -60,10 +60,6 @@
 	  <h1>Compile</h1>
 	</div>
 	<div class="container">
-	  <div class="alert-message warning" data-alert="alert">
-	    <a class="close" href="#">×</a
-	    <p></p>
-	  </div>
 	  <div class="row">
 	    <div class="span9">
 	      <form class="form-stacked" id="form-compile">
@@ -176,6 +172,9 @@ printInt fact(5);
 	      </div>
 	    </div>
 	  </div>
+	  <div class="alert-message error" data-alert="alert" id="alert-compile" style="display: none">
+	    <p></p>
+	  </div>
 	</div>
       </section>
 
@@ -213,6 +212,9 @@ printInt fact(5);
 	      </form>
 	    </div>
 	  </div>
+	  <div class="alert-message error" data-alert="alert" id="alert-execute" style="display: none">
+	    <p></p>
+	  </div>
 	</div>
       </section>
     </div>
@@ -242,10 +244,12 @@ printInt fact(5);
            'target' : $('#form-compile input').val()},
           function(data, status) {
             if (data['status'] == 'ok') {
+              $('#alert-compile').css('display', 'none')
               $('#form-execute textarea').val(data['detail']['program']);
               $('html,body').animate({scrollTop: $('#execute').offset().top})
             } else {
-              alert(data['detail']['description']);
+              $('#alert-compile > p').text(data['detail']['description'])
+              $('#alert-compile').css('display', 'block')
             }
           }, "json"
         );
@@ -259,8 +263,11 @@ printInt fact(5);
         try {
           output = executor.execute(data, target);
           $('#form-result textarea').val(output);
+          $('#alert-execute').css('display', 'none');
         } catch (x) {
           console.log(x);
+          $('#alert-execute > p').text(x.message);
+          $('#alert-execute').css('display', 'block');
         }
         return false;
       });
