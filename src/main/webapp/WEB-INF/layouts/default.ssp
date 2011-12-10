@@ -47,8 +47,8 @@
 	    手続き型っぽいプログラミング言語で書いたプログラムを <a href="http://mithrilworks.jp/neta/perogramming.html">ペログラム言語</a> に変換します。<br/>
 	    変換したコードをブラウザ上で実行することも出来ます。<br/>
 	    2011年12月10日(土)に <a href="http://partake.in/events/7b7f6551-8683-4968-855f-f8a62ec4bc93">第二回Scala会議</a> でLTをしました。<br/>
-	    ソースコードは <a href="http://github.com/mtgto">GitHub</a> から取得できます。<br/>
-	    当日使用したスライドは <a onclick="alert('TODO')">SlideShare</a> にアップロードしています。
+	    ソースコードは <a href="http://github.com/mtgto/comperoter">GitHub</a> から取得できます。<br/>
+	    当日使用したスライドは <a href="http://www.slideshare.net/SatoshiGoto/ss-10537233">SlideShare</a> にアップロードしています。
 	  </p>
         </div>
       </div>
